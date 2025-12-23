@@ -1,0 +1,3 @@
+# Minimal wwpp config
+site_title: wwpp
+PicoDeprecated.enabled: true
