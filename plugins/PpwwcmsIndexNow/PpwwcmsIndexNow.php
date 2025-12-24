@@ -92,7 +92,7 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
             'last_status' => $ok ? 'success' : 'failed'
         );
         $this->saveCache();
-        $this->log(($ok ? '[OK] ' : '[FAIL] ') . $url . ' mtime=' . $mtime . ' host=' . $host);
+        $this->log(($ok ? '[OK] ' : '[FAIL] ') . $url . ' mtime=' . $mtime . ' host=' . $host . ' endpoint=' . $endpoint . ' key=' . $this->maskKey($key));
     }
 
     /**
@@ -128,11 +128,13 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
         curl_close($ch);
 
         if ($err !== 0) {
+            $this->log('[ERR] cURL err=' . $err . ' url=' . $endpoint . ' host=' . $host);
             return false;
         }
         if ($code >= 200 && $code < 300) {
             return true;
         }
+        $this->log('[HTTP] code=' . $code . ' url=' . $endpoint . ' host=' . $host . ' body=' . substr((string)$resp, 0, 200));
         return false;
     }
 
@@ -205,6 +207,17 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
             return $path;
         }
         return null;
+    }
+
+    protected function maskKey($key)
+    {
+        if (!$key) {
+            return '';
+        }
+        if (strlen($key) <= 6) {
+            return '***';
+        }
+        return substr($key, 0, 3) . '***' . substr($key, -3);
     }
 
     protected function normalizeUrl($url, $baseUrl)
