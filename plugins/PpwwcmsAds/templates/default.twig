@@ -1,0 +1,22 @@
+{#
+  PpwwcmsAds 默认模板（推荐主题 include 方式）
+
+  用法：在主题的 base.twig / index.twig 合适位置加入：
+    {% include '@ppww_ads/default.twig' %}
+
+  说明：
+  - 不会强制输出任何广告位；未配置/未命中规则时为空。
+  - _runtime 建议放在 </body> 前；此模板已经这么做。
+  - header/footer/sidebar 是否输出，取决于你把 include 放在哪里。
+#}
+
+{# 侵入式 overlay：建议放 body 内任意位置；本模板放在最前 #}
+{{ pico_ads._intrusive|default('')|raw }}
+
+{# 主题位置广告位（你可以按需删掉某些区域的输出） #}
+{{ pico_ads.header|default('')|raw }}
+{{ pico_ads.sidebar|default('')|raw }}
+{{ pico_ads.footer|default('')|raw }}
+
+{# 运行时脚本：频控/设备/lazy/侵入式倒计时等 #}
+{{ pico_ads._runtime|default('')|raw }}

@@ -1,146 +1,3 @@
-##
-# 基础
-#
-site_title: 主优化词                 # 站点主优化词
-base_url: ~                         # 自动猜测站点基础 URL，失败时可在此填写；示例：https://example.com/wwppcms/
-rewrite_url: true                      # 是否强制启用 URL 重写（true/false）
-debug: ~                            # 设为 true 启用 Wwppcms 调试模式
-timezone: ~                         # 若 PHP 需要手动设置时区，可在此指定
-locale: ~                           # 若 PHP 需要手动设置区域设置，可在此指定
-
-##
-# 主题
-#
-theme: d                      # 自定义主题名称
-themes_url: ~                       # 自动猜测主题目录 URL，失败时在此填写；示例：https://example.com/wwppcms/themes/
-theme_config:                       # 主题额外配置
-    widescreen: false               # 默认主题：使用更宽的布局
-twig_config:                        # Twig 模板引擎配置
-    autoescape: html                # 默认对变量开启转义
-    strict_variables: false         # 设为 true 时，未定义变量会导致错误
-    charset: utf-8                  # 模板字符集
-    debug: ~                        # 启用 Twig 调试模式
-    cache: false                    # 指定可写目录以启用 Twig 缓存
-    auto_reload: ~                  # 模板变更时自动重新编译
-
-##
-# 内容
-#
-date_format: "%Y-%m-%d %H:%M"       # Wwppcms 默认中文日期格式；参考 https://php.net/manual/en/function.strftime.php
-pages_order_by_meta: author         # 按元数据 author 排序（pages_order_by 设为 meta）
-pages_order_by: alpha               # 页面排序方式：alpha/date/meta
-pages_order: asc                    # 排序方向：asc/desc
-content_dir: ~                      # 内容目录路径
-content_ext: .md                    # Markdown 文件扩展名
-content_config:                     # Parsedown Markdown 解析配置
-    extra: true                     # 使用 Parsedown Extra 支持扩展语法；见 https://michelf.ca/projects/php-markdown/extra/
-    breaks: false                   # 是否保留换行
-    escape: false                   # 是否转义内容中的 HTML（非安全模式，不用于不可信输入）
-    auto_urls: true                 # 自动为内容中的 URL 添加链接
-assets_dir: assets/                 # 静态资源目录路径
-assets_url: ~                       # 自动猜测资源目录 URL，失败时在此填写；示例：https://example.com/wwppcms/assets/
-
-##
-# 插件
-#
-plugins_url: ~                      # 自动猜测插件目录 URL，失败时在此填写；示例：https://example.com/wwppcms/plugins/
-DummyPlugin.enabled: false          # 强制禁用 DummyPlugin
-WwppcmsDeprecated.enabled: true     # 提供旧版本 API/主题的兼容层
-# PpwwcmsIndexNow 示例（取消注释启用主动推送）
-PpwwcmsIndexNow:
-  enabled: true
-  key: a1b2c3d4e5f67890abcdef1234567890        # 同时需在站点根目录放置 /indexnow.txt，文件内容即此 key
-  endpoint: https://api.indexnow.org/indexnow
-  min_interval: 3600                 # 同一 URL 最小推送间隔（秒）
-
-
-# PpwwcmsSchemaLd 示例（取消注释启用；字段优先级：页面 front-matter > 此处配置 > 自动兜底）
-# PpwwcmsSchemaLd:
-#   website:
-#     name: 示例站点名
-#     url: https://example.com/
-#     search_url: https://example.com/search?q={search_term_string}
-#   organization:
-#     name: 示例公司
-#     url: https://example.com/
-#     logo: https://example.com/assets/logo.png
-#     sameAs: [https://twitter.com/example, https://www.linkedin.com/company/example]
-#   breadcrumb:
-#     - name: 首页
-#       url: https://example.com/
-#   article:
-#     author: 示例作者
-#     section: 教程
-#     tags: [标签A, 标签B]
-#   itemList:
-#     items:
-#       - name: 推荐一
-#         url: https://example.com/a
-#       - name: 推荐二
-#         url: https://example.com/b
-#   faq:
-#     items:
-#       - question: 问题1？
-#         answer: 回答1。
-#       - question: 问题2？
-#         answer: 回答2。
-# PpwwcmsOg 示例（取消注释以启用并自定义默认 OG/Twitter/Article/Robots）
-# PpwwcmsOg:
-#   og:
-#     title: 站点默认 OG 标题            # 可被页面 front-matter 的 og.title 覆盖
-#     description: 站点默认 OG 描述        # 可被页面 front-matter 的 og.description 覆盖
-#     url: https://example.com/           # 如不填自动使用当前页面 URL
-#     type: website                       # 常用 website / article
-#     site_name: 我的站点名称
-#     image: https://example.com/assets/og-cover.png
-#     locale: zh_CN
-#     image_width: 1200
-#     image_height: 630
-#   twitter:
-#     card: summary_large_image           # 默认 summary_large_image
-#     title: 默认 Twitter 标题             # 可被页面 front-matter 的 twitter.title 覆盖
-#     description: 默认 Twitter 描述       # 可被页面 front-matter 的 twitter.description 覆盖
-#     image: https://example.com/assets/og-cover.png
-#   article:
-#     published_time: 2024-01-01T00:00:00+08:00
-#     modified_time: 2024-01-02T12:00:00+08:00
-#     author: 作者姓名
-#     section: 栏目名称
-#     tags: [标签1, 标签2]
-#   robots: index,follow                 # 若主题未输出 robots，可在此设置默认 robots
-
-PpwwcmsOg:
-  og:
-    url: 
-    type: website
-    locale: zh_CN
-    image_width: 1200
-    image_height: 630
-  twitter:
-    card: summary_large_image
-  article:
-  robots: index,follow
-# PpwwcmsRobots 示例（取消注释并按需修改即可自定义 robots.txt 与 sitemap）
-# PpwwcmsRobots:
-#   robots:
-#     - user_agents: "*"
-#       disallow: []                # 留空表示允许全部
-#       allow: ["/"]
-#     - user_agents: "AhrefsBot"
-#       disallow: ["/"]            # 禁止某些爬虫
-#   sitemap:
-#     - url: %base_url%/custom-page # 额外加入自定义 URL
-#       changefreq: weekly
-#       priority: 0.7
-##
-# 自定义
-#
-my_custom_setting: Hello World!     # 在主题中可用 {{ config.my_custom_setting }} 访问此设置
-
-
-# 下面是广告的配置信息
-#
-# 注意：YAML 的顶级键名必须是 PpwwcmsAds
 # 将本段合并到站点的 config/config.yml 中（重要）
 #
 # 你要做的事：
@@ -174,7 +31,6 @@ PpwwcmsAds:
   #     这里是一段文字...
   #     [[ads:in_article_1]]
   #     这里是下一段...
-  
   shortcode: true
 
   # 主题级广告位绑定（把 slot 映射到“页面区域”）
@@ -205,9 +61,9 @@ PpwwcmsAds:
     # 小提醒：多条 after_paragraph 会从“大 n 到小 n”插入，避免段落序号被前一次插入影响
     after_paragraph:
       - n: 2
-        slot: in_article_text
-      - n: 3
-        slot: in_article_img
+        slot: in_article_1
+      - n: 5
+        slot: in_article_2
 
   # 运行时脚本（前端 JS）：
   # 负责这些功能：
@@ -224,10 +80,14 @@ PpwwcmsAds:
     force: false
 
     # external.enabled:
-    # - true  使用外链 JS：页面只输出 <script src="/ads/runtime.js">（推荐，更“干净”）
+    # - true  使用外链 JS：页面只输出 <script src="/ads/runtime.js">，HTML 源码更“干净”（推荐）
     # - false 使用内联 JS：页面源码会看到一大段 <script>...</script>
+    #
+    # 注意：开启 external 后，插件会提供一个端点：
+    # - %base_url%/ads/runtime.js
+    # 你可以在浏览器里直接打开看看是否正常返回 JS。
     external:
-      enabled: true
+      enabled: false
 
   # 全局定向参数
   targeting:
@@ -247,7 +107,7 @@ PpwwcmsAds:
     # 是否给广告链接加 nofollow：
     # - false 默认只加 rel="sponsored"
     # - true  加 rel="sponsored nofollow"
-    nofollow: true
+    nofollow: false
 
   # 安全（默认最安全）
   security:
@@ -302,7 +162,7 @@ PpwwcmsAds:
     # countdown_seconds：
     # - 弹窗出现后，关闭按钮需要等待多少秒才能点击（倒计时）
     # - 设为 0 表示不倒计时
-    countdown_seconds: 5
+    countdown_seconds: 3
 
     # cta_url：
     # - 弹窗里的“行动按钮（CTA）”点击跳转到哪里
@@ -380,7 +240,7 @@ PpwwcmsAds:
         # - all（默认）手机电脑都显示
         # - mobile 只在手机显示
         # - desktop 只在电脑显示
-        device: all  # all|mobile|desktop
+        device: desktop  # all|mobile|desktop
         path_include:
           - "/posts/*"
       creatives:
@@ -410,34 +270,6 @@ PpwwcmsAds:
           type: html
           weight: 50
           html: "<div>赞助内容 B</div>"
-
-    # 文章内：文字广告（可点击）
-    # - 名字我给你用“ 一页博彩导航入口 ”：直观表达是导航入口
-    # - 注意：href 必须带 http/https，否则点击统计的 /ads/click 会判定无效
-    in_article_text:
-      targeting:
-        include:
-          - "/news/*"
-          - "/"
-      creatives:
-        - id: txt1
-          type: html
-          weight: 100
-          html: "<a class='ppww-ads__link' href='https://baidu.com/' target='_blank'>一页博彩导航入口</a>"
-
-    # 文章内：图片广告（可点击）
-    in_article_img:
-      targeting:
-        include:
-          - "/news/*"
-          - "/"
-      creatives:
-        - id: img1
-          type: image
-          weight: 100
-          src: "/assets/ads/ads-yiye.gif"
-          href: "https://baidu.com/"
-          alt: "一页博彩导航"
 
     intrusive_overlay:
       targeting:
