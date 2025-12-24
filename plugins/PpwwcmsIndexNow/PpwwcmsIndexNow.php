@@ -19,6 +19,8 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
     public function onPluginsLoaded()
     {
         $this->logDir = dirname(__FILE__) . '/logs/';
+        /** @var string */
+        protected $metaKey = '__meta';
         if (!is_dir($this->logDir)) {
             @mkdir($this->logDir, 0775, true);
         }
@@ -49,6 +51,22 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
         $baseUrl = rtrim($this->getBaseUrl(), '/');
         $url = isset($current['url']) ? $current['url'] : null;
         $file = isset($current['file_path']) ? $current['file_path'] : null;
+
+            $baseUrl = rtrim($this->getBaseUrl(), '/');
+
+            // 初始化推送（仅执行一次，受 min_interval 控制）
+            $this->ensureInitPush($baseUrl);
+
+            // 跳过草稿/私有页
+            $id = isset($current['id']) ? $current['id'] : '';
+            if ($this->isSkipped($id)) {
+                return;
+            }
+
+            // 跳过 noindex 页面
+            if ($this->isNoindex($meta)) {
+                return;
+            }
         if (!$file) {
             $file = $this->resolveContentPath(isset($current['id']) ? $current['id'] : null);
         }
