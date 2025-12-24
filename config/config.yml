@@ -46,6 +46,15 @@ assets_url: ~                       # 自动猜测资源目录 URL，失败时�
 plugins_url: ~                      # 自动猜测插件目录 URL，失败时在此填写；示例：https://example.com/wwppcms/plugins/
 DummyPlugin.enabled: false          # 强制禁用 DummyPlugin
 WwppcmsDeprecated.enabled: true     # 提供旧版本 API/主题的兼容层
+# PpwwcmsOg 示例（取消注释以自定义 og 标签，未填则使用页面元信息/站点标题自动生成）
+# PpwwcmsOg:
+#   og:
+#     title: 自定义标题
+#     description: 自定义描述
+#     url: https://example.com/
+#     type: website
+#     site_name: 我的站点
+#     image: https://example.com/assets/og-cover.png
 # PpwwcmsRobots 示例（取消注释并按需修改即可自定义 robots.txt 与 sitemap）
 # PpwwcmsRobots:
 #   robots:
