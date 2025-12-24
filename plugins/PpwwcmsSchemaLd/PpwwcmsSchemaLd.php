@@ -151,7 +151,11 @@ class PpwwcmsSchemaLd extends AbstractWwppcmsPlugin
             'url' => $url
         );
 
+        // Logo priority: page meta -> plugin config -> fallback to site default logo
         $logo = $this->pick($meta, $cfg, array('schema_org_logo', 'org_logo', 'logo'), null);
+        if (!$logo) {
+            $logo = $this->defaultLogoUrl($baseUrl);
+        }
         if ($logo) {
             $org['logo'] = $logo;
         }
@@ -427,6 +431,12 @@ class PpwwcmsSchemaLd extends AbstractWwppcmsPlugin
             }
         }
         return $out;
+    }
+
+    protected function defaultLogoUrl($baseUrl)
+    {
+        // Default logo path; adjust if theme changes
+        return rtrim($baseUrl, '/') . '/assets/logo.png';
     }
 
     protected function isNoindexPage(array $meta)
