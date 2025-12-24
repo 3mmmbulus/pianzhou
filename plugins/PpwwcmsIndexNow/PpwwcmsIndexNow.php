@@ -48,6 +48,9 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
 
         $url = isset($current['url']) ? $current['url'] : null;
         $file = isset($current['file_path']) ? $current['file_path'] : null;
+        if (!$file) {
+            $file = $this->resolveContentPath(isset($current['id']) ? $current['id'] : null);
+        }
         if (!$url || !$file) {
             return;
         }
@@ -177,5 +180,28 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
     {
         $msg = '[' . date('Y-m-d H:i:s') . '] ' . $line . "\n";
         @file_put_contents($this->logDir . 'indexnow.log', $msg, FILE_APPEND);
+    }
+
+    protected function resolveContentPath($id)
+    {
+        if ($id === null || $id === '') {
+            return null;
+        }
+        $contentDir = rtrim($this->getConfig('content_dir'), '/');
+        if ($contentDir === '') {
+            return null;
+        }
+        $ext = $this->getConfig('content_ext');
+        if (!$ext) {
+            $ext = '.md';
+        }
+        if ($ext[0] !== '.') {
+            $ext = '.' . $ext;
+        }
+        $path = $contentDir . '/' . $id . $ext;
+        if (is_file($path)) {
+            return $path;
+        }
+        return null;
     }
 }
