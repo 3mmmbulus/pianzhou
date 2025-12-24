@@ -41,10 +41,12 @@ class PpwwcmsSchemaLd extends AbstractWwppcmsPlugin
             }
         }
 
-        // Breadcrumb can apply to most pages; ensure we have at least home + current.
-        $breadcrumb = $this->buildBreadcrumb($meta, $config, $currentUrl, $siteTitle, $baseUrl, $currentId);
-        if ($breadcrumb) {
-            $this->schemas[] = $breadcrumb;
+        // Breadcrumb applies to non-home pages only.
+        if (!$isHome) {
+            $breadcrumb = $this->buildBreadcrumb($meta, $config, $currentUrl, $siteTitle, $baseUrl, $currentId);
+            if ($breadcrumb) {
+                $this->schemas[] = $breadcrumb;
+            }
         }
 
         // Article detection: meta.schema_type/article flag or template hint.
