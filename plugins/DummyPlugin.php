@@ -1,27 +1,27 @@
 <?php
 /**
- * This file is part of Pico. It's copyrighted by the contributors recorded
+ * This file is part of Wwppcms. It's copyrighted by the contributors recorded
  * in the version control history of the file, available from the following
  * original location:
  *
- * <https://github.com/picocms/Pico/blob/master/plugins/DummyPlugin.php>
+ * <https://github.com/wwppcms/Wwppcms/blob/master/plugins/DummyPlugin.php>
  *
  * SPDX-License-Identifier: MIT
  * License-Filename: LICENSE
  */
 
 /**
- * Pico dummy plugin - a template for plugins
+ * Wwppcms dummy plugin - a template for plugins
  *
  * You're a plugin developer? This template may be helpful :-)
  * Simply remove the events you don't need and add your own logic.
  *
  * @author  Daniel Rudolf
- * @link    http://picocms.org
+ * @link    http://wwppcms.org
  * @license http://opensource.org/licenses/MIT The MIT License
  * @version 2.1
  */
-class DummyPlugin extends AbstractPicoPlugin
+class DummyPlugin extends AbstractWwppcmsPlugin
 {
     /**
      * API version used by this plugin
@@ -35,13 +35,13 @@ class DummyPlugin extends AbstractPicoPlugin
      *
      * Usually you should remove this class property (or set it to NULL) to
      * leave the decision whether this plugin should be enabled or disabled by
-     * default up to Pico. If all the plugin's dependenies are fulfilled (see
-     * {@see DummyPlugin::$dependsOn}), Pico enables the plugin by default.
+     * default up to Wwppcms. If all the plugin's dependenies are fulfilled (see
+     * {@see DummyPlugin::$dependsOn}), Wwppcms enables the plugin by default.
      * Otherwise the plugin is silently disabled.
      *
      * If this plugin should never be disabled *silently* (e.g. when dealing
      * with security-relevant stuff like access control, or similar), set this
-     * to TRUE. If Pico can't fulfill all the plugin's dependencies, it will
+     * to TRUE. If Wwppcms can't fulfill all the plugin's dependencies, it will
      * throw an RuntimeException.
      *
      * If this plugin rather does some "crazy stuff" a user should really be
@@ -50,9 +50,9 @@ class DummyPlugin extends AbstractPicoPlugin
      * on this plugin, it might get enabled silently nevertheless.
      *
      * No matter what, the user can always explicitly enable or disable this
-     * plugin in Pico's config.
+     * plugin in Wwppcms's config.
      *
-     * @see AbstractPicoPlugin::$enabled
+     * @see AbstractWwppcmsPlugin::$enabled
      * @var bool|null
      */
     protected $enabled = false;
@@ -63,20 +63,20 @@ class DummyPlugin extends AbstractPicoPlugin
      * If your plugin doesn't depend on any other plugin, remove this class
      * property.
      *
-     * @see AbstractPicoPlugin::$dependsOn
+     * @see AbstractWwppcmsPlugin::$dependsOn
      * @var string[]
      */
     protected $dependsOn = array();
 
     /**
-     * Triggered after Pico has loaded all available plugins
+     * Triggered after Wwppcms has loaded all available plugins
      *
      * This event is triggered nevertheless the plugin is enabled or not.
      * It is NOT guaranteed that plugin dependencies are fulfilled!
      *
-     * @see Pico::loadPlugin()
-     * @see Pico::getPlugin()
-     * @see Pico::getPlugins()
+     * @see Wwppcms::loadPlugin()
+     * @see Wwppcms::getPlugin()
+     * @see Wwppcms::getPlugins()
      *
      * @param object[] $plugins loaded plugin instances
      */
@@ -86,11 +86,11 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered when Pico manually loads a plugin
+     * Triggered when Wwppcms manually loads a plugin
      *
-     * @see Pico::loadPlugin()
-     * @see Pico::getPlugin()
-     * @see Pico::getPlugins()
+     * @see Wwppcms::loadPlugin()
+     * @see Wwppcms::getPlugin()
+     * @see Wwppcms::getPlugins()
      *
      * @param object $plugin loaded plugin instance
      */
@@ -100,11 +100,11 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has read its configuration
+     * Triggered after Wwppcms has read its configuration
      *
-     * @see Pico::getConfig()
-     * @see Pico::getBaseUrl()
-     * @see Pico::isUrlRewritingEnabled()
+     * @see Wwppcms::getConfig()
+     * @see Wwppcms::getBaseUrl()
+     * @see Wwppcms::isUrlRewritingEnabled()
      *
      * @param array &$config array of config variables
      */
@@ -114,9 +114,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered before Pico loads its theme
+     * Triggered before Wwppcms loads its theme
      *
-     * @see Pico::loadTheme()
+     * @see Wwppcms::loadTheme()
      * @see DummyPlugin::onThemeLoaded()
      *
      * @param string &$theme name of current theme
@@ -127,11 +127,11 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico loaded its theme
+     * Triggered after Wwppcms loaded its theme
      *
      * @see DummyPlugin::onThemeLoading()
-     * @see Pico::getTheme()
-     * @see Pico::getThemeApiVersion()
+     * @see Wwppcms::getTheme()
+     * @see Wwppcms::getThemeApiVersion()
      *
      * @param string $theme           name of current theme
      * @param int    $themeApiVersion API version of the theme
@@ -143,9 +143,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has evaluated the request URL
+     * Triggered after Wwppcms has evaluated the request URL
      *
-     * @see Pico::getRequestUrl()
+     * @see Wwppcms::getRequestUrl()
      *
      * @param string &$url part of the URL describing the requested contents
      */
@@ -155,10 +155,10 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has discovered the content file to serve
+     * Triggered after Wwppcms has discovered the content file to serve
      *
-     * @see Pico::resolveFilePath()
-     * @see Pico::getRequestFile()
+     * @see Wwppcms::resolveFilePath()
+     * @see Wwppcms::getRequestFile()
      *
      * @param string &$file absolute path to the content file to serve
      */
@@ -168,9 +168,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered before Pico reads the contents of the file to serve
+     * Triggered before Wwppcms reads the contents of the file to serve
      *
-     * @see Pico::loadFileContent()
+     * @see Wwppcms::loadFileContent()
      * @see DummyPlugin::onContentLoaded()
      */
     public function onContentLoading()
@@ -179,9 +179,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered before Pico reads the contents of a 404 file
+     * Triggered before Wwppcms reads the contents of a 404 file
      *
-     * @see Pico::load404Content()
+     * @see Wwppcms::load404Content()
      * @see DummyPlugin::on404ContentLoaded()
      */
     public function on404ContentLoading()
@@ -190,11 +190,11 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has read the contents of the 404 file
+     * Triggered after Wwppcms has read the contents of the 404 file
      *
      * @see DummyPlugin::on404ContentLoading()
-     * @see Pico::getRawContent()
-     * @see Pico::is404Content()
+     * @see Wwppcms::getRawContent()
+     * @see Wwppcms::is404Content()
      *
      * @param string &$rawContent raw file contents
      */
@@ -204,15 +204,15 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has read the contents of the file to serve
+     * Triggered after Wwppcms has read the contents of the file to serve
      *
-     * If Pico serves a 404 file, this event is triggered with the raw contents
-     * of said 404 file. Use {@see Pico::is404Content()} to check for this
+     * If Wwppcms serves a 404 file, this event is triggered with the raw contents
+     * of said 404 file. Use {@see Wwppcms::is404Content()} to check for this
      * case when necessary.
      *
      * @see DummyPlugin::onContentLoading()
-     * @see Pico::getRawContent()
-     * @see Pico::is404Content()
+     * @see Wwppcms::getRawContent()
+     * @see Wwppcms::is404Content()
      *
      * @param string &$rawContent raw file contents
      */
@@ -222,9 +222,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered before Pico parses the meta header
+     * Triggered before Wwppcms parses the meta header
      *
-     * @see Pico::parseFileMeta()
+     * @see Wwppcms::parseFileMeta()
      * @see DummyPlugin::onMetaParsed()
      */
     public function onMetaParsing()
@@ -233,10 +233,10 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has parsed the meta header
+     * Triggered after Wwppcms has parsed the meta header
      *
      * @see DummyPlugin::onMetaParsing()
-     * @see Pico::getFileMeta()
+     * @see Wwppcms::getFileMeta()
      *
      * @param string[] &$meta parsed meta data
      */
@@ -246,10 +246,10 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered before Pico parses the pages content
+     * Triggered before Wwppcms parses the pages content
      *
-     * @see Pico::prepareFileContent()
-     * @see Pico::substituteFileContent()
+     * @see Wwppcms::prepareFileContent()
+     * @see Wwppcms::substituteFileContent()
      * @see DummyPlugin::onContentPrepared()
      * @see DummyPlugin::onContentParsed()
      */
@@ -259,10 +259,10 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has prepared the raw file contents for parsing
+     * Triggered after Wwppcms has prepared the raw file contents for parsing
      *
      * @see DummyPlugin::onContentParsing()
-     * @see Pico::parseFileContent()
+     * @see Wwppcms::parseFileContent()
      * @see DummyPlugin::onContentParsed()
      *
      * @param string &$markdown Markdown contents of the requested page
@@ -273,11 +273,11 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has parsed the contents of the file to serve
+     * Triggered after Wwppcms has parsed the contents of the file to serve
      *
      * @see DummyPlugin::onContentParsing()
      * @see DummyPlugin::onContentPrepared()
-     * @see Pico::getFileContent()
+     * @see Wwppcms::getFileContent()
      *
      * @param string &$content parsed contents (HTML) of the requested page
      */
@@ -287,7 +287,7 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered before Pico reads all known pages
+     * Triggered before Wwppcms reads all known pages
      *
      * @see DummyPlugin::onPagesDiscovered()
      * @see DummyPlugin::onPagesLoaded()
@@ -298,10 +298,10 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered before Pico loads a single page
+     * Triggered before Wwppcms loads a single page
      *
      * Set the `$skipFile` parameter to TRUE to remove this page from the pages
-     * array. Pico usually passes NULL by default, unless it is a conflicting
+     * array. Wwppcms usually passes NULL by default, unless it is a conflicting
      * page (i.e. `content/sub.md`, but there's also a `content/sub/index.md`),
      * then it passes TRUE. Don't change this value incautiously if it isn't
      * NULL! Someone likely set it to TRUE or FALSE on purpose...
@@ -319,7 +319,7 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered when Pico loads the raw contents of a single page
+     * Triggered when Wwppcms loads the raw contents of a single page
      *
      * Please note that this event isn't triggered when the currently processed
      * page is the requested page. The reason for this exception is that the
@@ -337,9 +337,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered when Pico loads a single page
+     * Triggered when Wwppcms loads a single page
      *
-     * Please refer to {@see Pico::readPages()} for information about the
+     * Please refer to {@see Wwppcms::readPages()} for information about the
      * structure of a single page's data.
      *
      * @see DummyPlugin::onSinglePageLoading()
@@ -353,11 +353,11 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has discovered all known pages
+     * Triggered after Wwppcms has discovered all known pages
      *
-     * Pico's pages array isn't sorted until the `onPagesLoaded` event is
-     * triggered. Please refer to {@see Pico::readPages()} for information
-     * about the structure of Pico's pages array and the structure of a single
+     * Wwppcms's pages array isn't sorted until the `onPagesLoaded` event is
+     * triggered. Please refer to {@see Wwppcms::readPages()} for information
+     * about the structure of Wwppcms's pages array and the structure of a single
      * page's data.
      *
      * @see DummyPlugin::onPagesLoading()
@@ -371,15 +371,15 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has sorted the pages array
+     * Triggered after Wwppcms has sorted the pages array
      *
-     * Please refer to {@see Pico::readPages()} for information about the
-     * structure of Pico's pages array and the structure of a single page's
+     * Please refer to {@see Wwppcms::readPages()} for information about the
+     * structure of Wwppcms's pages array and the structure of a single page's
      * data.
      *
      * @see DummyPlugin::onPagesLoading()
      * @see DummyPlugin::onPagesDiscovered()
-     * @see Pico::getPages()
+     * @see Wwppcms::getPages()
      *
      * @param array[] &$pages sorted list of all known pages
      */
@@ -389,16 +389,16 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered when Pico discovered the current, previous and next pages
+     * Triggered when Wwppcms discovered the current, previous and next pages
      *
-     * If Pico isn't serving a regular page, but a plugin's virtual page, there
+     * If Wwppcms isn't serving a regular page, but a plugin's virtual page, there
      * will neither be a current, nor previous or next pages. Please refer to
-     * {@see Pico::readPages()} for information about the structure of a single
+     * {@see Wwppcms::readPages()} for information about the structure of a single
      * page's data.
      *
-     * @see Pico::getCurrentPage()
-     * @see Pico::getPreviousPage()
-     * @see Pico::getNextPage()
+     * @see Wwppcms::getCurrentPage()
+     * @see Wwppcms::getPreviousPage()
+     * @see Wwppcms::getNextPage()
      *
      * @param array|null &$currentPage  data of the page being served
      * @param array|null &$previousPage data of the previous page
@@ -413,12 +413,12 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico built the page tree
+     * Triggered after Wwppcms built the page tree
      *
-     * Please refer to {@see Pico::buildPageTree()} for information about
-     * the structure of Pico's page tree array.
+     * Please refer to {@see Wwppcms::buildPageTree()} for information about
+     * the structure of Wwppcms's page tree array.
      *
-     * @see Pico::getPageTree()
+     * @see Wwppcms::getPageTree()
      *
      * @param  array  &$pageTree page tree
      */
@@ -428,7 +428,7 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered before Pico renders the page
+     * Triggered before Wwppcms renders the page
      *
      * @see DummyPlugin::onPageRendered()
      *
@@ -441,7 +441,7 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered after Pico has rendered the page
+     * Triggered after Wwppcms has rendered the page
      *
      * @see DummyPlugin::onPageRendering()
      *
@@ -453,9 +453,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered when Pico reads its known meta header fields
+     * Triggered when Wwppcms reads its known meta header fields
      *
-     * @see Pico::getMetaHeaders()
+     * @see Wwppcms::getMetaHeaders()
      *
      * @param string[] &$headers list of known meta header fields; the array
      *     key specifies the YAML key to search for, the array value is later
@@ -467,9 +467,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered when Pico registers the YAML parser
+     * Triggered when Wwppcms registers the YAML parser
      *
-     * @see Pico::getYamlParser()
+     * @see Wwppcms::getYamlParser()
      *
      * @param \Symfony\Component\Yaml\Parser &$yamlParser YAML parser instance
      */
@@ -479,9 +479,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered when Pico registers the Parsedown parser
+     * Triggered when Wwppcms registers the Parsedown parser
      *
-     * @see Pico::getParsedown()
+     * @see Wwppcms::getParsedown()
      *
      * @param Parsedown &$parsedown Parsedown instance
      */
@@ -491,9 +491,9 @@ class DummyPlugin extends AbstractPicoPlugin
     }
 
     /**
-     * Triggered when Pico registers the twig template engine
+     * Triggered when Wwppcms registers the twig template engine
      *
-     * @see Pico::getTwig()
+     * @see Wwppcms::getTwig()
      *
      * @param Twig_Environment &$twig Twig instance
      */

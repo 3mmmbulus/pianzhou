@@ -1,3 +1,4 @@
 # Minimal wwpp config
 site_title: wwpp
-PicoDeprecated.enabled: true
+WwppcmsDeprecated.enabled: true
+rewrite_url: true

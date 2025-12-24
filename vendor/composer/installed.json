@@ -111,36 +111,36 @@
             "install-path": "../erusev/parsedown-extra"
         },
         {
-            "name": "picocms/pico-deprecated",
+            "name": "wwppcms/deprecated",
             "version": "v2.1.4",
             "version_normalized": "2.1.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/picocms/pico-deprecated.git",
+                "url": "https://github.com/wwppcms/deprecated.git",
                 "reference": "8d1a4056ecc71cc2857e91d50bcb38db91d424e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/picocms/pico-deprecated/zipball/8d1a4056ecc71cc2857e91d50bcb38db91d424e0",
+                "url": "https://api.github.com/repos/wwppcms/deprecated/zipball/8d1a4056ecc71cc2857e91d50bcb38db91d424e0",
                 "reference": "8d1a4056ecc71cc2857e91d50bcb38db91d424e0",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0",
-                "picocms/pico": "self.version"
+                "php": ">=8.0",
+                "wwppcms/core": "self.version"
             },
             "time": "2020-08-29T15:11:07+00:00",
-            "type": "pico-plugin",
+            "type": "wwppcms-plugin",
             "extra": {
                 "branch-alias": {
                     "dev-master": "2.1.x-dev",
-                    "dev-pico-3.0": "3.0.x-dev"
+                    "dev-wwppcms-3.0": "3.0.x-dev"
                 }
             },
             "installation-source": "dist",
             "autoload": {
                 "classmap": [
-                    "PicoDeprecated.php",
+                    "WwppcmsDeprecated.php",
                     "lib/",
                     "plugins/"
                 ]
@@ -152,59 +152,58 @@
             "authors": [
                 {
                     "name": "Daniel Rudolf",
-                    "email": "picocms.org@daniel-rudolf.de",
+                    "email": "wwppcms.org@daniel-rudolf.de",
                     "role": "Lead Developer"
                 },
                 {
-                    "name": "The Pico Community",
-                    "homepage": "http://picocms.org/"
+                    "name": "The Wwppcms Community",
+                    "homepage": "http://wwppcms.org/"
                 },
                 {
                     "name": "Contributors",
-                    "homepage": "https://github.com/picocms/pico-deprecated/graphs/contributors"
+                    "homepage": "https://github.com/wwppcms/deprecated/graphs/contributors"
                 }
             ],
-            "description": "This is Pico's official PicoDeprecated plugin. Pico is a stupidly simple, blazing fast, flat file CMS.",
-            "homepage": "http://picocms.org/",
+            "description": "This is Wwppcms's official WwppcmsDeprecated plugin. Wwppcms is a stupidly simple, blazing fast, flat file CMS.",
+            "homepage": "http://wwppcms.org/",
             "keywords": [
                 "compatibility",
                 "deprecation",
-                "pico",
-                "pico-deprecated",
-                "picocms",
-                "picocms-plugin"
+                "wwppcms",
+                "wwppcms-deprecated",
+                "wwppcms-plugin"
             ],
             "support": {
-                "docs": "http://picocms.org/plugins/deprecated/",
-                "issues": "https://github.com/picocms/pico-deprecated/issues",
-                "source": "https://github.com/picocms/pico-deprecated"
+                "docs": "http://wwppcms.org/plugins/deprecated/",
+                "issues": "https://github.com/wwppcms/deprecated/issues",
+                "source": "https://github.com/wwppcms/deprecated"
             },
-            "install-path": "../picocms/pico-deprecated"
+            "install-path": "../wwppcms/deprecated"
         },
         {
-            "name": "picocms/pico-theme",
+            "name": "wwppcms/theme-default",
             "version": "v2.1.4",
             "version_normalized": "2.1.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/picocms/pico-theme.git",
+                "url": "https://github.com/wwppcms/theme-default.git",
                 "reference": "d4ec8df28356f1e034a97d37327b9aecb3129eed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/picocms/pico-theme/zipball/d4ec8df28356f1e034a97d37327b9aecb3129eed",
+                "url": "https://api.github.com/repos/wwppcms/theme-default/zipball/d4ec8df28356f1e034a97d37327b9aecb3129eed",
                 "reference": "d4ec8df28356f1e034a97d37327b9aecb3129eed",
                 "shasum": ""
             },
             "require": {
-                "picocms/pico": "self.version"
+                "wwppcms/core": "self.version"
             },
             "time": "2020-08-29T15:11:43+00:00",
-            "type": "pico-theme",
+            "type": "wwppcms-theme",
             "extra": {
                 "branch-alias": {
                     "dev-master": "2.1.x-dev",
-                    "dev-pico-3.0": "3.0.x-dev"
+                    "dev-wwppcms-3.0": "3.0.x-dev"
                 },
                 "installer-name": "default"
             },
@@ -216,33 +215,31 @@
             "authors": [
                 {
                     "name": "Daniel Rudolf",
-                    "email": "picocms.org@daniel-rudolf.de",
+                    "email": "wwppcms.org@daniel-rudolf.de",
                     "role": "Lead Developer"
                 },
                 {
-                    "name": "The Pico Community",
-                    "homepage": "http://picocms.org/"
+                    "name": "The Wwppcms Community",
+                    "homepage": "http://wwppcms.org/"
                 },
                 {
                     "name": "Contributors",
-                    "homepage": "https://github.com/picocms/pico-theme/graphs/contributors"
+                    "homepage": "https://github.com/theme-default/graphs/contributors"
                 }
             ],
-            "description": "This is Pico's official default theme. Pico is a stupidly simple, blazing fast, flat file CMS.",
-            "homepage": "http://picocms.org/",
+            "description": "This is Wwppcms's official default theme. Wwppcms is a stupidly simple, blazing fast, flat file CMS.",
+            "homepage": "http://wwppcms.org/",
             "keywords": [
                 "default-theme",
-                "pico",
-                "pico-theme",
-                "picocms",
-                "picocms-theme"
+                "wwppcms",
+                "wwppcms-theme"
             ],
             "support": {
-                "docs": "http://picocms.org/themes/default/",
-                "issues": "https://github.com/picocms/pico-theme/issues",
-                "source": "https://github.com/picocms/pico-theme"
+                "docs": "http://wwppcms.org/themes/default/",
+                "issues": "https://github.com/wwppcms/theme-default/issues",
+                "source": "https://github.com/wwppcms/theme-default"
             },
-            "install-path": "../picocms/pico-theme"
+            "install-path": "../wwppcms/theme-default"
         },
         {
             "name": "symfony/polyfill-ctype",

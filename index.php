@@ -1,10 +1,10 @@
 <?php // @codingStandardsIgnoreFile
 /**
- * This file is part of Pico. It's copyrighted by the contributors recorded
+ * This file is part of Wwppcms. It's copyrighted by the contributors recorded
  * in the version control history of the file, available from the following
  * original location:
  *
- * <https://github.com/picocms/Pico/blob/master/index.php>
+ * <https://github.com/wwppcms/Wwppcms/blob/master/index.php>
  *
  * SPDX-License-Identifier: MIT
  * License-Filename: LICENSE
@@ -19,14 +19,14 @@ if (is_file(__DIR__ . '/vendor/autoload.php')) {
     require_once(__DIR__ . '/../../../vendor/autoload.php');
 } else {
     die(
-        "Cannot find 'vendor/autoload.php'. If you're using a composer-based Pico install, run `composer install`. "
-        . "If you're rather trying to use one of Pico's pre-built release packages, make sure to download Pico's "
-        . "latest release package named 'pico-release-v*.tar.gz' (don't download a source code package)."
+        "Cannot find 'vendor/autoload.php'. If you're using a composer-based Wwppcms install, run `composer install`. "
+        . "If you're rather trying to use one of Wwppcms's pre-built release packages, make sure to download Wwppcms's "
+        . "latest release package named 'wwppcms-release-v*.tar.gz' (don't download a source code package)."
     );
 }
 
-// instance Pico
-$pico = new Pico(
+// instance Wwppcms
+$wwppcms = new Wwppcms(
     __DIR__,    // root dir
     'config/',  // config dir
     'plugins/', // plugins dir
@@ -34,7 +34,7 @@ $pico = new Pico(
 );
 
 // override configuration?
-//$pico->setConfig(array());
+//$wwppcms->setConfig(array());
 
 // run application
-echo $pico->run();
+echo $wwppcms->run();

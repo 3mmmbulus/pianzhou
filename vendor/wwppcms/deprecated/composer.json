@@ -1,0 +1,41 @@
+{
+    "name": "wwppcms/deprecated",
+    "type": "wwppcms-plugin",
+    "description": "This is wwppcms's official deprecated compatibility plugin.",
+    "keywords": [ "wwppcms", "wwppcms-plugin", "wwppcms-deprecated", "compatibility", "deprecation" ],
+    "homepage": "http://wwppcms.org/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Rudolf",
+            "email": "wwppcms.org@daniel-rudolf.de",
+            "role": "Lead Developer"
+        },
+        {
+            "name": "The Wwppcms Community",
+            "homepage": "http://wwppcms.org/"
+        },
+        {
+            "name": "Contributors",
+            "homepage": "https://github.com/wwppcms/wwppcms-deprecated/graphs/contributors"
+        }
+    ],
+    "support": {
+        "docs": "http://wwppcms.org/plugins/deprecated/",
+        "issues": "https://github.com/wwppcms/deprecated/issues",
+        "source": "https://github.com/wwppcms/deprecated"
+    },
+    "require": {
+        "php": ">=8.0",
+        "wwppcms/core": "self.version"
+    },
+    "autoload": {
+        "classmap": [ "WwppcmsDeprecated.php", "lib/", "plugins/" ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1.x-dev",
+            "dev-wwppcms-3.0": "3.0.x-dev"
+        }
+    }
+}

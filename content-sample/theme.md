@@ -6,14 +6,14 @@ hidden: true
 Theme Styling Test
 ==================
 
-This is `theme.md` in Pico's content directory. This page doesn't show up in the website's menu due to `hidden: true` in the page's YAML header. The purpose of this page is to aid theme development - below you'll find basically every format that is possible with Markdown. If you develop a theme, you should make sure that all examples below show decent.
+This is `theme.md` in Wwppcms's content directory. This page doesn't show up in the website's menu due to `hidden: true` in the page's YAML header. The purpose of this page is to aid theme development - below you'll find basically every format that is possible with Markdown. If you develop a theme, you should make sure that all examples below show decent.
 
 Text
 ----
 
 **Lorem ipsum dolor sit amet,** consectetur adipisici elit, *sed eiusmod tempor* incidunt ut labore et dolore magna aliqua.[^1] ~~Ut enim ad minim veniam,~~ quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.[^2] [Quis aute iure reprehenderit][Link] in voluptate velit esse cillum dolore eu fugiat nulla pariatur. `Excepteur` sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-[![Pico Logo](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHBhdGggZD0ibTI5OC40IDE5NC43cTAtMTQuMTUtLjgtMzEuMmwtLjg1LTE0LjI1aC01MS4wNXY4OS45NWw4IDEuMXE5LjYgMS4wNSAxNy42IDEuMDUgNy45NSAwIDE3LjUtMS4wNSA0LjgtLjU1IDcuOTUtMS4xIDEuNjUtMjIuMiAxLjY1LTQ0LjVtLTY5Ljc1LTQ1LjhoLTQ5LjN2MTgyLjQ1bDcuNy44NXE5LjMuOCAxNyAuOCAxMi4zIDAgMjQuNi0xLjY1eiIgZmlsbD0iIzJlYWU5YiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTM4Ljg1IC00MC45NSkiLz48L3N2Zz4K)](%base_url% "Pico Logo") {.image .small .float-right}
+[![Wwppcms Logo](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHBhdGggZD0ibTI5OC40IDE5NC43cTAtMTQuMTUtLjgtMzEuMmwtLjg1LTE0LjI1aC01MS4wNXY4OS45NWw4IDEuMXE5LjYgMS4wNSAxNy42IDEuMDUgNy45NSAwIDE3LjUtMS4wNSA0LjgtLjU1IDcuOTUtMS4xIDEuNjUtMjIuMiAxLjY1LTQ0LjVtLTY5Ljc1LTQ1LjhoLTQ5LjN2MTgyLjQ1bDcuNy44NXE5LjMuOCAxNyAuOCAxMi4zIDAgMjQuNi0xLjY1eiIgZmlsbD0iIzJlYWU5YiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTM4Ljg1IC00MC45NSkiLz48L3N2Zz4K)](%base_url% "Wwppcms Logo") {.image .small .float-right}
 
 Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
 

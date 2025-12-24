@@ -1,6 +1,6 @@
 <?php return array(
     'root' => array(
-        'name' => 'picocms/pico',
+        'name' => 'wwppcms/site',
         'pretty_version' => '2.1.4',
         'version' => '2.1.4.0',
         'reference' => null,
@@ -28,7 +28,7 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'picocms/pico' => array(
+        'wwppcms/core' => array(
             'pretty_version' => '2.1.4',
             'version' => '2.1.4.0',
             'reference' => null,
@@ -37,21 +37,21 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'picocms/pico-deprecated' => array(
+        'wwppcms/deprecated' => array(
             'pretty_version' => 'v2.1.4',
             'version' => '2.1.4.0',
             'reference' => '8d1a4056ecc71cc2857e91d50bcb38db91d424e0',
-            'type' => 'pico-plugin',
-            'install_path' => __DIR__ . '/../picocms/pico-deprecated',
+            'type' => 'wwppcms-plugin',
+            'install_path' => __DIR__ . '/../wwppcms/deprecated',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'picocms/pico-theme' => array(
+        'wwppcms/theme-default' => array(
             'pretty_version' => 'v2.1.4',
             'version' => '2.1.4.0',
             'reference' => 'd4ec8df28356f1e034a97d37327b9aecb3129eed',
-            'type' => 'pico-theme',
-            'install_path' => __DIR__ . '/../picocms/pico-theme',
+            'type' => 'wwppcms-theme',
+            'install_path' => __DIR__ . '/../wwppcms/theme-default',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

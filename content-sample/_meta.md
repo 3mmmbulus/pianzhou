@@ -1,5 +1,5 @@
 ---
-Logo: %theme_url%/img/pico-white.svg
+Logo: %theme_url%/img/wwppcms-white.svg
 Tagline: wwpp — simple flat-file sites.
 Social:
     - title: wwpp on GitHub

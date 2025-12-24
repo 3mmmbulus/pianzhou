@@ -47,14 +47,6 @@ class ComposerStaticInit44537f40654107a41f467d34eb94f6b8
         ),
         'P' =>
         array (
-            'PicoPluginInterface' =>
-            array (
-                0 => __DIR__ . '/../..' . '/lib',
-            ),
-            'Pico' =>
-            array (
-                0 => __DIR__ . '/../..' . '/lib',
-            ),
             'ParsedownExtra' =>
             array (
                 0 => __DIR__ . '/..' . '/erusev/parsedown-extra',
@@ -64,9 +56,20 @@ class ComposerStaticInit44537f40654107a41f467d34eb94f6b8
                 0 => __DIR__ . '/..' . '/erusev/parsedown',
             ),
         ),
+        'W' =>
+        array (
+            'WwppcmsPluginInterface' =>
+            array (
+                0 => __DIR__ . '/../..' . '/lib',
+            ),
+            'Wwppcms' =>
+            array (
+                0 => __DIR__ . '/../..' . '/lib',
+            ),
+        ),
         'A' =>
         array (
-            'AbstractPicoPlugin' =>
+            'AbstractWwppcmsPlugin' =>
             array (
                 0 => __DIR__ . '/../..' . '/lib',
             ),
@@ -74,25 +77,25 @@ class ComposerStaticInit44537f40654107a41f467d34eb94f6b8
     );
 
     public static $classMap = array (
-        'AbstractPicoCompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/lib/AbstractPicoCompatPlugin.php',
-        'AbstractPicoPlugin' => __DIR__ . '/../..' . '/lib/AbstractPicoPlugin.php',
-        'AbstractPicoPluginApiCompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/lib/AbstractPicoPluginApiCompatPlugin.php',
+        'AbstractWwppcmsCompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/lib/AbstractWwppcmsCompatPlugin.php',
+        'AbstractWwppcmsPlugin' => __DIR__ . '/../..' . '/lib/AbstractWwppcmsPlugin.php',
+        'AbstractWwppcmsPluginApiCompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/lib/AbstractWwppcmsPluginApiCompatPlugin.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Parsedown' => __DIR__ . '/..' . '/erusev/parsedown/Parsedown.php',
         'ParsedownExtra' => __DIR__ . '/..' . '/erusev/parsedown-extra/ParsedownExtra.php',
-        'Pico' => __DIR__ . '/../..' . '/lib/Pico.php',
-        'PicoCompatPluginInterface' => __DIR__ . '/..' . '/picocms/pico-deprecated/lib/PicoCompatPluginInterface.php',
-        'PicoDeprecated' => __DIR__ . '/..' . '/picocms/pico-deprecated/PicoDeprecated.php',
-        'PicoMainCompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/plugins/PicoMainCompatPlugin.php',
-        'PicoPluginApi0CompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/plugins/PicoPluginApi0CompatPlugin.php',
-        'PicoPluginApi1CompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/plugins/PicoPluginApi1CompatPlugin.php',
-        'PicoPluginApi2CompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/plugins/PicoPluginApi2CompatPlugin.php',
-        'PicoPluginApiCompatPluginInterface' => __DIR__ . '/..' . '/picocms/pico-deprecated/lib/PicoPluginApiCompatPluginInterface.php',
-        'PicoPluginInterface' => __DIR__ . '/../..' . '/lib/PicoPluginInterface.php',
-        'PicoThemeApi0CompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/plugins/PicoThemeApi0CompatPlugin.php',
-        'PicoThemeApi1CompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/plugins/PicoThemeApi1CompatPlugin.php',
-        'PicoThemeApi2CompatPlugin' => __DIR__ . '/..' . '/picocms/pico-deprecated/plugins/PicoThemeApi2CompatPlugin.php',
-        'PicoTwigExtension' => __DIR__ . '/../..' . '/lib/PicoTwigExtension.php',
+        'Wwppcms' => __DIR__ . '/../..' . '/lib/Wwppcms.php',
+        'WwppcmsCompatPluginInterface' => __DIR__ . '/..' . '/wwppcms/deprecated/lib/WwppcmsCompatPluginInterface.php',
+        'WwppcmsDeprecated' => __DIR__ . '/..' . '/wwppcms/deprecated/WwppcmsDeprecated.php',
+        'WwppcmsMainCompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/plugins/WwppcmsMainCompatPlugin.php',
+        'WwppcmsPluginApi0CompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/plugins/WwppcmsPluginApi0CompatPlugin.php',
+        'WwppcmsPluginApi1CompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/plugins/WwppcmsPluginApi1CompatPlugin.php',
+        'WwppcmsPluginApi2CompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/plugins/WwppcmsPluginApi2CompatPlugin.php',
+        'WwppcmsPluginApiCompatPluginInterface' => __DIR__ . '/..' . '/wwppcms/deprecated/lib/WwppcmsPluginApiCompatPluginInterface.php',
+        'WwppcmsPluginInterface' => __DIR__ . '/../..' . '/lib/WwppcmsPluginInterface.php',
+        'WwppcmsThemeApi0CompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/plugins/WwppcmsThemeApi0CompatPlugin.php',
+        'WwppcmsThemeApi1CompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/plugins/WwppcmsThemeApi1CompatPlugin.php',
+        'WwppcmsThemeApi2CompatPlugin' => __DIR__ . '/..' . '/wwppcms/deprecated/plugins/WwppcmsThemeApi2CompatPlugin.php',
+        'WwppcmsTwigExtension' => __DIR__ . '/../..' . '/lib/WwppcmsTwigExtension.php',
         'Symfony\\Component\\Yaml\\Dumper' => __DIR__ . '/..' . '/symfony/yaml/Dumper.php',
         'Symfony\\Component\\Yaml\\Escaper' => __DIR__ . '/..' . '/symfony/yaml/Escaper.php',
         'Symfony\\Component\\Yaml\\Exception\\DumpException' => __DIR__ . '/..' . '/symfony/yaml/Exception/DumpException.php',
