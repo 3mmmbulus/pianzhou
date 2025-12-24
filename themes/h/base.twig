@@ -16,7 +16,7 @@
   {% if robots %}<meta name="robots" content="{{ robots }}">{% endif %}
   <link rel="stylesheet" href="{{ theme_url }}/assets/style.css">
 </head>
-<body class="t-h">
+<body class="t-h site">
   <a class="skip-link" href="#main">跳到正文</a>
   <header class="topbar">
     <div class="container topbar-inner">
@@ -31,7 +31,7 @@
     </div>
   </header>
 
-  <main id="main" class="container main">
+  <main id="main" class="container main site-main">
     {# Unique block (h only): Featured strip #}
     <section class="featured" aria-label="精选">
       <div class="badge">精选</div>
@@ -40,7 +40,7 @@
     {% block main %}{% endblock %}
   </main>
 
-  <footer class="foot">
+  <footer class="foot site-footer">
     <div class="container"><small>&copy; {{ "now"|date("Y") }} {{ site_title }}</small></div>
   </footer>
 </body>

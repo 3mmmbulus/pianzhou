@@ -52,3 +52,8 @@ img{max-width:100%;height:auto}
 .ppww-prev:hover,.ppww-next:hover{text-decoration:none;background:rgba(22,163,74,.08)}
 
 .site-footer{border-top:1px solid var(--border);padding:18px 0;color:var(--muted)}
+
+/* sticky footer */
+.site{min-height:100vh;display:flex;flex-direction:column}
+.site-main{flex:1 0 auto;display:flex;flex-direction:column}
+.site-footer{margin-top:auto}

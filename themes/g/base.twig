@@ -16,7 +16,7 @@
   {% if robots %}<meta name="robots" content="{{ robots }}">{% endif %}
   <link rel="stylesheet" href="{{ theme_url }}/assets/style.css">
 </head>
-<body class="t-g">
+<body class="t-g site">
   <a class="skip-link" href="#main">跳到正文</a>
   <div class="shell">
     <aside class="rail" aria-label="侧边导航">
@@ -38,7 +38,7 @@
       </div>
     </aside>
 
-    <main id="main" class="stage">
+    <main id="main" class="stage site-main">
       {% block main %}{% endblock %}
       <footer class="site-footer"><small>&copy; {{ "now"|date("Y") }} {{ site_title }}</small></footer>
     </main>

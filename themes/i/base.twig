@@ -16,7 +16,7 @@
   {% if robots %}<meta name="robots" content="{{ robots }}">{% endif %}
   <link rel="stylesheet" href="{{ theme_url }}/assets/style.css">
 </head>
-<body class="t-i">
+<body class="t-i site">
   <a class="skip-link" href="#main">跳到正文</a>
   <div class="doc">
     <aside class="sidebar" aria-label="目录">
@@ -39,14 +39,14 @@
       </div>
     </aside>
 
-    <main id="main" class="doc-main">
+    <main id="main" class="doc-main site-main">
       <header class="doc-header">
         <a class="home" href="{{ base_url }}/">首页</a>
         <span class="sep">/</span>
         <span class="crumb">{{ current_page.title|default('') }}</span>
       </header>
       {% block main %}{% endblock %}
-      <footer class="doc-footer"><small>&copy; {{ "now"|date("Y") }} {{ site_title }}</small></footer>
+      <footer class="doc-footer site-footer"><small>&copy; {{ "now"|date("Y") }} {{ site_title }}</small></footer>
     </main>
   </div>
 </body>

@@ -2,7 +2,7 @@
 *{box-sizing:border-box}html{color-scheme:light}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.75 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans",sans-serif}
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}img{max-width:100%;height:auto}
 .skip-link{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}.skip-link:focus{left:16px;top:16px;width:auto;height:auto;padding:8px 12px;background:#fff;border:1px solid var(--border);border-radius:10px;z-index:10}
-.doc{display:grid;grid-template-columns:1fr;min-height:100vh}
+.doc{display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr;min-height:100vh}
 @media(min-width:960px){.doc{grid-template-columns:300px 1fr}}
 .sidebar{border-bottom:1px solid var(--border);background:var(--card)}
 @media(min-width:960px){.sidebar{border-bottom:none;border-right:1px solid var(--border);position:sticky;top:0;align-self:start;height:100vh;overflow:auto}}
@@ -33,3 +33,8 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}img
 .pagination a{display:inline-block;padding:8px 12px;border:1px solid var(--border);border-radius:12px;color:var(--text);background:var(--card)}
 .pagination a:hover{text-decoration:none;background:rgba(22,163,74,.08)}.pagination .info{color:var(--muted)}
 .doc-footer{margin-top:18px;color:var(--muted)}
+
+/* sticky footer */
+.site{min-height:100vh;display:flex;flex-direction:column}
+.site-main{flex:1 0 auto;display:flex;flex-direction:column}
+.site-footer{margin-top:auto}

@@ -16,7 +16,7 @@
   {% if robots %}<meta name="robots" content="{{ robots }}">{% endif %}
   <link rel="stylesheet" href="{{ theme_url }}/assets/style.css">
 </head>
-<body class="t-l">
+<body class="t-l site">
   <a class="skip-link" href="#main">跳到正文</a>
   <header class="header">
     <div class="container header-inner">
@@ -31,10 +31,10 @@
     </div>
   </header>
 
-  <main id="main" class="container main">
+  <main id="main" class="container main site-main">
     {% block main %}{% endblock %}
   </main>
 
-  <footer class="foot"><div class="container"><small>&copy; {{ "now"|date("Y") }} {{ site_title }}</small></div></footer>
+  <footer class="foot site-footer"><div class="container"><small>&copy; {{ "now"|date("Y") }} {{ site_title }}</small></div></footer>
 </body>
 </html>

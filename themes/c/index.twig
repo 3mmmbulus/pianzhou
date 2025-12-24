@@ -3,12 +3,12 @@
 <head>
   {% include 'partials/head.twig' %}
 </head>
-<body>
+<body class="site">
   <a class="skip-link" href="#main">跳到正文</a>
 
   {% include 'partials/header.twig' %}
 
-  <main id="main" class="container">
+  <main id="main" class="container site-main">
     {% set page_id = current_page.id|default('') %}
     {% set is_404 = page_id == '404' or (page_id|split('/')|last) == '404' %}
     {% set is_news_index = page_id == 'news' or page_id == 'news/index' %}
