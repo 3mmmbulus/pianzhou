@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  {% include 'partials/head.twig' %}
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  {% include 'partials/header.twig' %}
+
+  <main id="main" class="container">
+    {% set page_id = current_page.id|default('') %}
+    {% set is_404 = page_id == '404' or (page_id|split('/')|last) == '404' %}
+    {% set is_news_index = page_id == 'news' or page_id == 'news/index' %}
+    {% set is_news_child = page_id|slice(0, 5) == 'news/' %}
+    {% set is_news_item = is_news_child and not is_news_index %}
+
+    {% if is_404 %}
+      <header class="page-header">
+        <h1>{{ current_page.title|default('404') }}</h1>
+      </header>
+      <article class="page-content">
+        {{ content }}
+      </article>
+    {% elseif is_news_index %}
+      {% include 'news/index.twig' %}
+    {% elseif is_news_item %}
+      {% include 'news/item.twig' %}
+    {% else %}
+      <header class="page-header">
+        <h1>{{ current_page.title|default(site_title) }}</h1>
+        {% set desc = meta.description|default(meta.Description|default('')) %}
+        {% if desc %}<p class="page-desc">{{ desc }}</p>{% endif %}
+      </header>
+      <article class="page-content">
+        {{ content }}
+      </article>
+    {% endif %}
+  </main>
+
+  {% include 'partials/footer.twig' %}
+
+  <script src="{{ theme_url }}/assets/app.js" defer></script>
+</body>
+</html>

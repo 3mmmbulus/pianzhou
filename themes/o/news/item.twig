@@ -1,0 +1,17 @@
+<article class="wiki">
+  <header class="wiki-head">
+    <h1 class="h1">{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+
+  <div class="wiki-grid">
+    {# Unique block (o only): Infobox aside #}
+    <aside class="infobox" aria-label="信息框">
+      <div class="row"><strong>分类</strong><span class="muted">新闻</span></div>
+      <div class="row"><strong>作者</strong><span class="muted">{{ meta.author|default(meta.Author|default(site_title)) }}</span></div>
+      <div class="row"><strong>日期</strong><span class="muted">{{ published }}</span></div>
+    </aside>
+    <div class="content">{{ content }}</div>
+  </div>
+</article>

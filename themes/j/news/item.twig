@@ -1,0 +1,11 @@
+<article>
+  <header class="article-head">
+    <h1 class="h1">{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+
+  {# Unique block (j only): Divider row #}
+  <div class="divider" role="presentation"></div>
+  <div class="content">{{ content }}</div>
+</article>

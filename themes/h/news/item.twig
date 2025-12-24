@@ -1,0 +1,14 @@
+<article class="article">
+  <header class="article-header">
+    <div class="kicker">专栏</div>
+    <h1>{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+
+  {# Unique block (h only): Pull-quote rail #}
+  <div class="article-grid">
+    <div class="content">{{ content }}</div>
+    <aside class="pull" aria-label="要点">要点：写清楚标题、摘要、配图。</aside>
+  </div>
+</article>

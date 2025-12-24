@@ -1,0 +1,15 @@
+<article class="article">
+  <header class="article-header">
+    <div class="kicker">新闻</div>
+    <h1>{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+  <div class="content">{{ content }}</div>
+
+  {# Unique block (g only): Author card placeholder #}
+  <aside class="author-card" aria-label="作者信息">
+    <strong>作者</strong>
+    <div class="muted">{{ meta.author|default(meta.Author|default(site_title)) }}</div>
+  </aside>
+</article>

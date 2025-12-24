@@ -1,0 +1,13 @@
+<article>
+  <h1 class="h1">{{ current_page.title|default('') }}</h1>
+  {% set published = meta.date|default(meta.Date|default('')) %}
+  {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+
+  {# Unique block (i only): Info box above content #}
+  <section class="infobox" aria-label="信息">
+    <div><strong>路径</strong><div class="muted">{{ current_page.id|default('') }}</div></div>
+    <div><strong>更新时间</strong><div class="muted">{{ meta.modified|default(meta.Modified|default(published)) }}</div></div>
+  </section>
+
+  <div class="content">{{ content }}</div>
+</article>

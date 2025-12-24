@@ -1,0 +1,10 @@
+<article class="article">
+  <header class="article-header">
+    <h1>{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+  {# Unique block (m only): Side notes band #}
+  <section class="notes" aria-label="边注">提示：图片使用统一比例可减少 CLS。</section>
+  <div class="content">{{ content }}</div>
+</article>

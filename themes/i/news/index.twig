@@ -1,0 +1,12 @@
+<h1 class="h1">{{ current_page.title|default('新闻') }}</h1>
+{% set d = meta.description|default(meta.Description|default('')) %}
+{% if d %}<p class="muted">{{ d }}</p>{% endif %}
+
+<section class="doc-note" aria-label="提示">
+  <strong>提示</strong>
+  <span class="muted">侧栏可切换到其它页面。</span>
+</section>
+
+<div class="content">
+  {{ content }}
+</div>

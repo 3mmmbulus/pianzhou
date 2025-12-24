@@ -1,0 +1,10 @@
+<article>
+  <header class="article-head">
+    <h1 class="h1">{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+  {# Unique block (n only): Photo notes #}
+  <section class="photo-notes" aria-label="图片注释">图片建议：使用 16:9 或 3:2 统一比例。</section>
+  <div class="content">{{ content }}</div>
+</article>

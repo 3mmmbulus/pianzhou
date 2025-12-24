@@ -1,0 +1,9 @@
+<header class="page-header">
+  <h1>{{ current_page.title|default('新闻') }}</h1>
+  {% set desc = meta.description|default(meta.Description|default('')) %}
+  {% if desc %}<p class="page-desc">{{ desc }}</p>{% endif %}
+</header>
+
+<section class="page-content">
+  {{ content }}
+</section>

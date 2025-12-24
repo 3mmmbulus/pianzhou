@@ -1,0 +1,29 @@
+<div class="news-list">
+  {% for item in ppww_items %}
+    <article class="news-item">
+      {% if item.thumb %}
+        <a class="thumb" href="{{ item.url }}">
+          <img src="{{ item.thumb }}" alt="{{ item.title }}" loading="lazy" decoding="async" width="960" height="540">
+        </a>
+      {% endif %}
+      <div class="desc">
+        <h2 class="title"><a href="{{ item.url }}">{{ item.title }}</a></h2>
+        {% if item.time %}<time class="date" datetime="{{ item.time|date('c') }}">{{ item.time|date('Y-m-d') }}</time>{% endif %}
+        {% if item.description %}<p class="excerpt">{{ item.description }}</p>{% endif %}
+      </div>
+    </article>
+  {% endfor %}
+
+  {% if ppww_total_pages > 1 %}
+    <article class="news-item news-item--pagination">
+      <div class="thumb" aria-hidden="true"></div>
+      <div class="desc">
+        <nav class="pagination" aria-label="新闻分页">
+          {% if ppww_page > 1 %}<a class="prev" href="{{ ppww_base }}?page={{ ppww_page - 1 }}" rel="prev">上一页</a>{% endif %}
+          <span class="info">第 {{ ppww_page }} / {{ ppww_total_pages }} 页</span>
+          {% if ppww_page < ppww_total_pages %}<a class="next" href="{{ ppww_base }}?page={{ ppww_page + 1 }}" rel="next">下一页</a>{% endif %}
+        </nav>
+      </div>
+    </article>
+  {% endif %}
+</div>

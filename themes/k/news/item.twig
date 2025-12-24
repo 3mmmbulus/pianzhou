@@ -1,0 +1,12 @@
+<article>
+  <header class="article-head">
+    <h1 class="h1">{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+  {# Unique block (k only): Post nav bar #}
+  <nav class="postbar" aria-label="文章辅助">
+    <a href="{{ base_url }}/news/">回到新闻列表</a>
+  </nav>
+  <div class="content">{{ content }}</div>
+</article>

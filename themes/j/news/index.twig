@@ -1,0 +1,9 @@
+<h1 class="h1">{{ current_page.title|default('新闻') }}</h1>
+{% set d = meta.description|default(meta.Description|default('')) %}
+{% if d %}<p class="muted">{{ d }}</p>{% endif %}
+<nav class="channels" aria-label="频道">
+	<span class="ch">全部</span>
+	<span class="ch">快讯</span>
+	<span class="ch">更新</span>
+</nav>
+<div class="content">{{ content }}</div>

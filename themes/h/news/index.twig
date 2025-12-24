@@ -1,0 +1,13 @@
+<header class="page-header">
+  <h1>{{ current_page.title|default('新闻') }}</h1>
+  {% set d = meta.description|default(meta.Description|default('')) %}
+  {% if d %}<p class="muted">{{ d }}</p>{% endif %}
+</header>
+
+<section class="content">
+  <section class="bulletin" aria-label="公告">
+    <strong>公告</strong>
+    <span class="muted">本页为新闻列表。</span>
+  </section>
+  {{ content }}
+</section>

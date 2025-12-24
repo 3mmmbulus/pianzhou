@@ -1,0 +1,18 @@
+<article class="article">
+  <header class="article-header">
+    <h1>{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}
+      <p class="article-meta"><time datetime="{{ published }}">{{ published }}</time></p>
+    {% endif %}
+  </header>
+
+  <div class="article-content">
+    {{ content }}
+  </div>
+
+  <nav class="article-nav" aria-label="文章翻页">
+    {% if previous_page %}<a class="nav-link" rel="prev" href="{{ previous_page.url }}">上一篇：{{ previous_page.title }}</a>{% endif %}
+    {% if next_page %}<a class="nav-link" rel="next" href="{{ next_page.url }}">下一篇：{{ next_page.title }}</a>{% endif %}
+  </nav>
+</article>

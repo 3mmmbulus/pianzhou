@@ -1,0 +1,8 @@
+<article class="article">
+  <header class="article-header">
+    <h1>{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+  <div class="content">{{ content }}</div>
+</article>

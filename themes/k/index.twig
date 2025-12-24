@@ -1,0 +1,36 @@
+{% extends 'base.twig' %}
+{% block main %}
+  {% set page_id = current_page.id|default('') %}
+  {% set is_404 = page_id == '404' or (page_id|split('/')|last) == '404' %}
+  {% set is_news_index = page_id in ['news', 'news/index'] %}
+  {% set is_news_item = page_id|slice(0, 5) == 'news/' and not is_news_index %}
+
+  {% if is_404 %}
+    <h1 class="h1">{{ current_page.title|default('404') }}</h1>
+    <div class="content">{{ content }}</div>
+  {% elseif is_news_index %}
+    {% include 'news/index.twig' %}
+  {% elseif is_news_item %}
+    {% include 'news/item.twig' %}
+  {% else %}
+    {% if page_id in ['index',''] %}
+      {# Unique block (k only): Latest news teaser using pages() tree (no JSON-LD/OG) #}
+      <section class="latest" aria-label="最新新闻">
+        <div class="latest-head">
+          <h2>最新新闻</h2>
+          <a href="{{ base_url }}/news/">更多</a>
+        </div>
+        <ul class="latest-list">
+          {% set items = pages('news', null, 1, 0) %}
+          {% for p in items|sort_by('time')|reverse %}
+            {% if p.id not in ['news','news/index'] and not p.hidden and loop.index <= 3 %}
+              <li><a href="{{ p.url }}">{{ p.title }}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+    <h1 class="h1">{{ current_page.title|default(site_title) }}</h1>
+    <div class="content">{{ content }}</div>
+  {% endif %}
+{% endblock %}

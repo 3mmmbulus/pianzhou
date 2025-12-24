@@ -1,0 +1,13 @@
+<header class="page-header">
+  <h1>{{ current_page.title|default('新闻') }}</h1>
+  {% set d = meta.description|default(meta.Description|default('')) %}
+  {% if d %}<p class="muted">{{ d }}</p>{% endif %}
+  <div class="news-toolbar" aria-label="工具栏">
+    <span class="muted">阅读模式 · 列表</span>
+  </div>
+</header>
+
+<section class="content">
+  {# News list HTML is produced by plugin; theme provides structure via partials/news_list.twig #}
+  {{ content }}
+</section>

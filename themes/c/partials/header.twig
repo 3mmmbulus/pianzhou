@@ -1,0 +1,17 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="brand">
+      <a class="brand-link" href="{{ base_url }}/">{{ site_title }}</a>
+    </div>
+
+    <nav class="site-nav" aria-label="主导航">
+      <a class="nav-link" href="{{ base_url }}/">首页</a>
+      <a class="nav-link" href="{{ base_url }}/news/">新闻</a>
+      {% for p in pages() %}
+        {% if not p.hidden and p.id not in ['404','news','news/index'] %}
+          <a class="nav-link" href="{{ p.url }}">{{ p.title }}</a>
+        {% endif %}
+      {% endfor %}
+    </nav>
+  </div>
+</header>

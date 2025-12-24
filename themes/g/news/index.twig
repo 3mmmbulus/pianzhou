@@ -1,0 +1,13 @@
+<header class="page-header">
+  <h1>{{ current_page.title|default('新闻') }}</h1>
+  {% set d = meta.description|default(meta.Description|default('')) %}
+  {% if d %}<p class="muted">{{ d }}</p>{% endif %}
+</header>
+
+<section class="content">
+  <div class="unique-g-list" aria-label="列表提示">
+    <span class="pill">卡片网格</span>
+    <span class="pill">按页浏览</span>
+  </div>
+  {{ content }}
+</section>

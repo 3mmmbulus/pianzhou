@@ -1,0 +1,26 @@
+{% extends 'base.twig' %}
+{% block main %}
+  {% set page_id = current_page.id|default('') %}
+  {% set is_404 = page_id == '404' or (page_id|split('/')|last) == '404' %}
+  {% set is_news_index = page_id in ['news', 'news/index'] %}
+  {% set is_news_item = page_id|slice(0, 5) == 'news/' and not is_news_index %}
+
+  {% if is_404 %}
+    <header class="page-header"><h1>{{ current_page.title|default('404') }}</h1></header>
+    <article class="content">{{ content }}</article>
+  {% elseif is_news_index %}
+    {% include 'news/index.twig' %}
+  {% elseif is_news_item %}
+    {% include 'news/item.twig' %}
+  {% else %}
+    {# Home unique: multi-section columns using section blocks #}
+    {% if page_id in ['index',''] %}
+      <section class="front">
+        <div class="front-a"><h1>{{ current_page.title|default(site_title) }}</h1><p class="muted">{{ meta.description|default(meta.Description|default('')) }}</p></div>
+        <div class="front-b"><strong>版块</strong><div class="muted">头条 / 快讯 / 专题</div></div>
+      </section>
+    {% endif %}
+    <header class="page-header"><h2>{{ current_page.title|default(site_title) }}</h2></header>
+    <article class="content">{{ content }}</article>
+  {% endif %}
+{% endblock %}

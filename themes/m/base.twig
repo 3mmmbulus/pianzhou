@@ -1,0 +1,47 @@
+{% set page_title = current_page.title|default(site_title) %}
+{% set is_home = (current_page.id|default('')) in ['index', ''] %}
+{% set full_title = is_home ? page_title : (page_title ~ ' - ' ~ site_title) %}
+{% set desc = meta.description|default(meta.Description|default(pages.index.meta.description|default(''))) %}
+{% set canonical = current_page.url|default(base_url ~ '/') %}
+{% set robots = meta.robots|default(meta.Robots|default('')) %}
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{{ full_title }}</title>
+  {% if desc %}<meta name="description" content="{{ desc }}">{% endif %}
+  <link rel="canonical" href="{{ canonical }}">
+  {% if robots %}<meta name="robots" content="{{ robots }}">{% endif %}
+  <link rel="stylesheet" href="{{ theme_url }}/assets/style.css">
+</head>
+<body class="t-m">
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="bar">
+    <div class="container bar-inner">
+      <a class="name" href="{{ base_url }}/">{{ site_title }}</a>
+      <nav class="menu" aria-label="主导航">
+        <a href="{{ base_url }}/news/">新闻</a>
+        {% for p in pages() %}{% if not p.hidden and p.id not in ['404','news','news/index'] %}
+          <a href="{{ p.url }}">{{ p.title }}</a>
+        {% endif %}{% endfor %}
+      </nav>
+    </div>
+  </header>
+
+  {# Unique block (m only): Ticker strip #}
+  <div class="ticker" aria-label="滚动条">
+    <div class="container">今日摘要：保持更新频率，标题清晰、图片规范。</div>
+  </div>
+
+  <main id="main" class="container grid">
+    <section class="col-main">{% block main %}{% endblock %}</section>
+    <aside class="col-aside" aria-label="侧栏">
+      <div class="box"><strong>公告</strong><div class="muted">此栏仅主题展示。</div></div>
+    </aside>
+  </main>
+
+  <footer class="foot"><div class="container"><small>&copy; {{ "now"|date("Y") }} {{ site_title }}</small></div></footer>
+</body>
+</html>

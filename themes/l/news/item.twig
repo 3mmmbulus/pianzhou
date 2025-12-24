@@ -1,0 +1,14 @@
+<article>
+  <header class="article-head">
+    <h1 class="h1">{{ current_page.title|default('') }}</h1>
+    {% set published = meta.date|default(meta.Date|default('')) %}
+    {% if published %}<p class="muted"><time datetime="{{ published }}">{{ published }}</time></p>{% endif %}
+  </header>
+  {# Unique block (l only): CTA banner #}
+  <section class="cta" aria-label="行动">
+    <strong>想要更多曝光？</strong>
+    <span class="muted">持续发布新闻并保持标题清晰。</span>
+    <a class="cta-link" href="{{ base_url }}/news/">去看新闻列表</a>
+  </section>
+  <div class="content">{{ content }}</div>
+</article>

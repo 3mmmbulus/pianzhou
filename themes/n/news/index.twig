@@ -1,0 +1,8 @@
+<h1 class="h1">{{ current_page.title|default('新闻') }}</h1>
+{% set d = meta.description|default(meta.Description|default('')) %}
+{% if d %}<p class="muted">{{ d }}</p>{% endif %}
+
+{# Unique layout on list (n only): grid gallery wrapper #}
+<section class="gallery-wrap">
+  {{ content }}
+</section>

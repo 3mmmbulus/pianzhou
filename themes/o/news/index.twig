@@ -1,0 +1,8 @@
+<h1 class="h1">{{ current_page.title|default('新闻') }}</h1>
+{% set d = meta.description|default(meta.Description|default('')) %}
+{% if d %}<p class="muted">{{ d }}</p>{% endif %}
+<aside class="legend" aria-label="说明">
+	<strong>说明</strong>
+	<span class="muted">本主题文章页含信息框布局。</span>
+</aside>
+<div class="content">{{ content }}</div>

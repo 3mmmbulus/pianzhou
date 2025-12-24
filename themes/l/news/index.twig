@@ -1,0 +1,8 @@
+<h1 class="h1">{{ current_page.title|default('新闻') }}</h1>
+{% set d = meta.description|default(meta.Description|default('')) %}
+{% if d %}<p class="muted">{{ d }}</p>{% endif %}
+<section class="promo-strip" aria-label="提示">
+	<strong>提示</strong>
+	<span class="muted">保持标题与摘要一致。</span>
+</section>
+<div class="content">{{ content }}</div>

@@ -1,0 +1,27 @@
+{% extends 'base.twig' %}
+{% block main %}
+  {% set page_id = current_page.id|default('') %}
+  {% set is_404 = page_id == '404' or (page_id|split('/')|last) == '404' %}
+  {% set is_news_index = page_id in ['news', 'news/index'] %}
+  {% set is_news_item = page_id|slice(0, 5) == 'news/' and not is_news_index %}
+
+  {% if is_404 %}
+    <h1 class="h1">{{ current_page.title|default('404') }}</h1>
+    <div class="content">{{ content }}</div>
+  {% elseif is_news_index %}
+    {% include 'news/index.twig' %}
+  {% elseif is_news_item %}
+    {% include 'news/item.twig' %}
+  {% else %}
+    {% if page_id in ['index',''] %}
+      {# Unique block (j only): Highlights ribbon #}
+      <section class="highlights" aria-label="亮点">
+        <div class="hl">轻量主题</div>
+        <div class="hl">移动优先</div>
+        <div class="hl">布局极简</div>
+      </section>
+    {% endif %}
+    <h1 class="h1">{{ current_page.title|default(site_title) }}</h1>
+    <div class="content">{{ content }}</div>
+  {% endif %}
+{% endblock %}
