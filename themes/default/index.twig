@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-
-    <title>{% if meta.title %}{{ meta.title }} | {% endif %}{{ site_title }}</title>
+    {% set is_home = current_page and current_page.id == "index" %}
+    <title>{% if is_home %}{{ meta.title|default("") }}{% else %}{% if meta.title %}{{ meta.title }} | {% endif %}{{ site_title }}{% endif %}</title>
     {% if meta.description %}
         <meta name="description" content="{{ meta.description|striptags }}" />
     {% endif %}
