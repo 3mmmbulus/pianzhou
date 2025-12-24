@@ -46,6 +46,7 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
             return;
         }
 
+        $baseUrl = rtrim($this->getBaseUrl(), '/');
         $url = isset($current['url']) ? $current['url'] : null;
         $file = isset($current['file_path']) ? $current['file_path'] : null;
         if (!$file) {
@@ -55,6 +56,7 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
             return;
         }
 
+        $url = $this->normalizeUrl($url, $baseUrl);
         $mtime = @filemtime($file);
         if ($mtime === false) {
             return;
@@ -203,5 +205,21 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
             return $path;
         }
         return null;
+    }
+
+    protected function normalizeUrl($url, $baseUrl)
+    {
+        $parts = parse_url($url);
+        if ($parts && isset($parts['host'])) {
+            return $url; // already absolute
+        }
+
+        // query-style (?sub/1)
+        if (strpos($url, '?') === 0) {
+            return $baseUrl . '/' . $url;
+        }
+
+        // relative path
+        return $baseUrl . '/' . ltrim($url, '/');
     }
 }
