@@ -16,6 +16,16 @@
         <link rel="canonical" href="{{ current_page.url }}" />
     {% endif %}
 
+    {# Open Graph tags (from PpwwcmsOg plugin or meta fallback) #}
+    {% if og is defined %}
+        <meta property="og:title" content="{{ og.title }}" />
+        {% if og.description %}<meta property="og:description" content="{{ og.description }}" />{% endif %}
+        <meta property="og:type" content="{{ og.type }}" />
+        <meta property="og:url" content="{{ og.url }}" />
+        <meta property="og:site_name" content="{{ og.site_name }}" />
+        {% if og.image %}<meta property="og:image" content="{{ og.image }}" />{% endif %}
+    {% endif %}
+
     <link rel="stylesheet" href="{{ theme_url }}/css/style.css" type="text/css" />
     <link rel="stylesheet" href="{{ theme_url }}/css/droidsans.css" type="text/css" />
     <link rel="stylesheet" href="{{ theme_url }}/css/fontello.css" type="text/css" />

@@ -46,15 +46,42 @@ assets_url: ~                       # 自动猜测资源目录 URL，失败时�
 plugins_url: ~                      # 自动猜测插件目录 URL，失败时在此填写；示例：https://example.com/wwppcms/plugins/
 DummyPlugin.enabled: false          # 强制禁用 DummyPlugin
 WwppcmsDeprecated.enabled: true     # 提供旧版本 API/主题的兼容层
-# PpwwcmsOg 示例（取消注释以自定义 og 标签，未填则使用页面元信息/站点标题自动生成）
+# PpwwcmsOg 示例（取消注释以启用并自定义默认 OG/Twitter/Article/Robots）
 # PpwwcmsOg:
 #   og:
-#     title: 自定义标题
-#     description: 自定义描述
-#     url: https://example.com/
-#     type: website
-#     site_name: 我的站点
+#     title: 站点默认 OG 标题            # 可被页面 front-matter 的 og.title 覆盖
+#     description: 站点默认 OG 描述        # 可被页面 front-matter 的 og.description 覆盖
+#     url: https://example.com/           # 如不填自动使用当前页面 URL
+#     type: website                       # 常用 website / article
+#     site_name: 我的站点名称
 #     image: https://example.com/assets/og-cover.png
+#     locale: zh_CN
+#     image_width: 1200
+#     image_height: 630
+#   twitter:
+#     card: summary_large_image           # 默认 summary_large_image
+#     title: 默认 Twitter 标题             # 可被页面 front-matter 的 twitter.title 覆盖
+#     description: 默认 Twitter 描述       # 可被页面 front-matter 的 twitter.description 覆盖
+#     image: https://example.com/assets/og-cover.png
+#   article:
+#     published_time: 2024-01-01T00:00:00+08:00
+#     modified_time: 2024-01-02T12:00:00+08:00
+#     author: 作者姓名
+#     section: 栏目名称
+#     tags: [标签1, 标签2]
+#   robots: index,follow                 # 若主题未输出 robots，可在此设置默认 robots
+
+PpwwcmsOg:
+  og:
+    url: 
+    type: website
+    locale: zh_CN
+    image_width: 1200
+    image_height: 630
+  twitter:
+    card: summary_large_image
+  article:
+  robots: index,follow
 # PpwwcmsRobots 示例（取消注释并按需修改即可自定义 robots.txt 与 sitemap）
 # PpwwcmsRobots:
 #   robots:
