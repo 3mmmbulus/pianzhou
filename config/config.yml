@@ -47,11 +47,13 @@ plugins_url: ~                      # 自动猜测插件目录 URL，失败时�
 DummyPlugin.enabled: false          # 强制禁用 DummyPlugin
 WwppcmsDeprecated.enabled: true     # 提供旧版本 API/主题的兼容层
 # PpwwcmsIndexNow 示例（取消注释启用主动推送）
-# PpwwcmsIndexNow:
-#   enabled: true
-#   key: your-indexnow-key-here        # 同时需在站点根目录放置 /indexnow.txt，文件内容即此 key
-#   endpoint: https://api.indexnow.org/indexnow
-#   min_interval: 3600                 # 同一 URL 最小推送间隔（秒）
+PpwwcmsIndexNow:
+  enabled: true
+  key: a1b2c3d4e5f67890abcdef1234567890        # 同时需在站点根目录放置 /indexnow.txt，文件内容即此 key
+  endpoint: https://api.indexnow.org/indexnow
+  min_interval: 3600                 # 同一 URL 最小推送间隔（秒）
+
+
 # PpwwcmsSchemaLd 示例（取消注释启用；字段优先级：页面 front-matter > 此处配置 > 自动兜底）
 # PpwwcmsSchemaLd:
 #   website:

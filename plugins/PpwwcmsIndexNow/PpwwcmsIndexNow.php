@@ -18,7 +18,7 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
 
     public function onPluginsLoaded()
     {
-        $this->logDir = $this->getPluginPath() . 'logs/';
+        $this->logDir = dirname(__FILE__) . '/logs/';
         if (!is_dir($this->logDir)) {
             @mkdir($this->logDir, 0775, true);
         }
