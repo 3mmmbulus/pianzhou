@@ -57,12 +57,23 @@ class PpwwcmsOg extends AbstractWwppcmsPlugin
      */
     public function onPageRendering(&$templateName, array &$twigVariables)
     {
+        // reset per-request state
+        $this->ogData = null;
+        $this->twitterData = null;
+        $this->robotsMeta = null;
+        $this->articleMeta = null;
+
         $meta = isset($twigVariables['meta']) ? $twigVariables['meta'] : array();
         $current = isset($twigVariables['current_page']) ? $twigVariables['current_page'] : array();
         $configOg = $this->getPluginConfig('og', array());
         $configTwitter = $this->getPluginConfig('twitter', array());
         $configArticle = $this->getPluginConfig('article', array());
         $configRobots = $this->getPluginConfig('robots', null);
+
+        // Skip OG/Twitter/robots on error/404 pages or explicitly noindex pages
+        if ($this->isErrorPage($templateName, $meta, $current) || $this->isNoindexPage($meta)) {
+            return;
+        }
 
         $siteTitle = $this->getConfig('site_title');
         $baseUrl = rtrim($this->getBaseUrl(), '/');
@@ -315,5 +326,37 @@ class PpwwcmsOg extends AbstractWwppcmsPlugin
             return;
         }
         $lines[] = '    <meta name="' . $name . '" content="' . $this->escape($value) . '" />';
+    }
+
+    protected function isErrorPage($templateName, array $meta, array $current)
+    {
+        // Detect via template name, explicit meta status, or common id markers
+        $tpl = strtolower((string)$templateName);
+        if (strpos($tpl, '404') !== false || strpos($tpl, 'error') !== false) {
+            return true;
+        }
+
+        if (isset($meta['http_status']) && (int)$meta['http_status'] === 404) {
+            return true;
+        }
+        if (isset($meta['status_code']) && (int)$meta['status_code'] === 404) {
+            return true;
+        }
+
+        $id = isset($current['id']) ? strtolower((string)$current['id']) : '';
+        if ($id === '404' || $id === '_404' || $id === 'error' || $id === '_error') {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function isNoindexPage(array $meta)
+    {
+        if (!isset($meta['robots'])) {
+            return false;
+        }
+        $robots = strtolower((string)$meta['robots']);
+        return strpos($robots, 'noindex') !== false;
     }
 }

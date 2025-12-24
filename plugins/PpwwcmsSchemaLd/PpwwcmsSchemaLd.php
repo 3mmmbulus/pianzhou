@@ -21,6 +21,11 @@ class PpwwcmsSchemaLd extends AbstractWwppcmsPlugin
         $current = isset($twigVariables['current_page']) ? $twigVariables['current_page'] : array();
         $config = $this->getPluginConfig(null, array());
 
+        // Skip JSON-LD on error/404 pages or explicitly noindex pages
+        if ($this->isErrorPage($templateName, $meta, $current) || $this->isNoindexPage($meta)) {
+            return;
+        }
+
         $siteTitle = $this->getConfig('site_title');
         $baseUrl = rtrim($this->getBaseUrl(), '/');
         $currentUrl = isset($current['url']) ? $current['url'] : $baseUrl . '/';
@@ -422,5 +427,37 @@ class PpwwcmsSchemaLd extends AbstractWwppcmsPlugin
             }
         }
         return $out;
+    }
+
+    protected function isNoindexPage(array $meta)
+    {
+        if (!isset($meta['robots'])) {
+            return false;
+        }
+        $robots = strtolower((string)$meta['robots']);
+        return strpos($robots, 'noindex') !== false;
+    }
+
+    protected function isErrorPage($templateName, array $meta, array $current)
+    {
+        // Common signals: template name contains 404/error, meta/http_status 404, or id hints
+        $tpl = strtolower((string)$templateName);
+        if (strpos($tpl, '404') !== false || strpos($tpl, 'error') !== false) {
+            return true;
+        }
+
+        if (isset($meta['http_status']) && (int)$meta['http_status'] === 404) {
+            return true;
+        }
+        if (isset($meta['status_code']) && (int)$meta['status_code'] === 404) {
+            return true;
+        }
+
+        $id = isset($current['id']) ? strtolower((string)$current['id']) : '';
+        if ($id === '404' || $id === '_404' || $id === 'error' || $id === '_error') {
+            return true;
+        }
+
+        return false;
     }
 }

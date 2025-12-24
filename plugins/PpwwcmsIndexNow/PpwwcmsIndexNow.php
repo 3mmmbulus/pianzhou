@@ -246,4 +246,91 @@ class PpwwcmsIndexNow extends AbstractWwppcmsPlugin
         // relative path
         return $baseUrl . '/' . ltrim($url, '/');
     }
+
+    /**
+     * 初始推送一次首页（或配置的 init_urls），受 min_interval 控制。
+     */
+    protected function ensureInitPush($baseUrl)
+    {
+        $key = $this->getPluginConfig('key', null);
+        if (empty($key)) {
+            return;
+        }
+
+        $endpoint = $this->getPluginConfig('endpoint', 'https://api.indexnow.org/indexnow');
+        $minInterval = (int) $this->getPluginConfig('min_interval', 3600);
+
+        $initState = isset($this->cache['__init']) ? $this->cache['__init'] : null;
+        $now = time();
+        if ($initState && isset($initState['pushed_at']) && ($now - (int)$initState['pushed_at']) < $minInterval) {
+            return;
+        }
+
+        $initUrls = $this->getPluginConfig('init_urls', array($baseUrl . '/'));
+        if (!is_array($initUrls)) {
+            $initUrls = array($initUrls);
+        }
+
+        $urls = array();
+        foreach ($initUrls as $u) {
+            $u = trim((string)$u);
+            if ($u === '') {
+                continue;
+            }
+            $urls[] = $this->normalizeUrl($u, $baseUrl);
+        }
+        $urls = array_values(array_unique($urls));
+        if (empty($urls)) {
+            return;
+        }
+
+        $host = $this->detectHost($urls[0]);
+        if (empty($host)) {
+            return;
+        }
+
+        $ok = $this->pushIndexNow($endpoint, $host, $key, $urls);
+
+        $this->cache['__init'] = array(
+            'pushed_at' => $ok ? $now : (isset($initState['pushed_at']) ? $initState['pushed_at'] : 0),
+            'last_try' => $now,
+            'last_status' => $ok ? 'success' : 'failed'
+        );
+        $this->saveCache();
+        $this->log(($ok ? '[INIT OK] ' : '[INIT FAIL] ') . implode(',', $urls) . ' host=' . $host . ' endpoint=' . $endpoint . ' key=' . $this->maskKey($key));
+    }
+
+    /**
+     * 检查页面元数据是否设置 noindex。
+     */
+    protected function isNoindex($meta)
+    {
+        if (!is_array($meta)) {
+            return false;
+        }
+
+        if (isset($meta['noindex']) && $meta['noindex']) {
+            return true;
+        }
+
+        if (isset($meta['robots'])) {
+            $robots = $meta['robots'];
+            if (is_array($robots)) {
+                $robots = implode(',', $robots);
+            }
+            $robots = strtolower((string)$robots);
+            if (strpos($robots, 'noindex') !== false) {
+                return true;
+            }
+        }
+
+        if (isset($meta['x-robots-tag'])) {
+            $robots = strtolower((string)$meta['x-robots-tag']);
+            if (strpos($robots, 'noindex') !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
