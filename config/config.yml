@@ -1,4 +1,64 @@
-# Minimal wwpp config
-site_title: wwpp
-WwppcmsDeprecated.enabled: true
-rewrite_url: true
+##
+# 基础
+#
+site_title: 主优化词                 # 站点主优化词
+base_url: ~                         # 自动猜测站点基础 URL，失败时可在此填写；示例：https://example.com/wwppcms/
+rewrite_url: true                      # 是否强制启用 URL 重写（true/false）
+debug: ~                            # 设为 true 启用 Wwppcms 调试模式
+timezone: ~                         # 若 PHP 需要手动设置时区，可在此指定
+locale: ~                           # 若 PHP 需要手动设置区域设置，可在此指定
+
+##
+# 主题
+#
+theme: default                      # 自定义主题名称
+themes_url: ~                       # 自动猜测主题目录 URL，失败时在此填写；示例：https://example.com/wwppcms/themes/
+theme_config:                       # 主题额外配置
+    widescreen: false               # 默认主题：使用更宽的布局
+twig_config:                        # Twig 模板引擎配置
+    autoescape: html                # 默认对变量开启转义
+    strict_variables: false         # 设为 true 时，未定义变量会导致错误
+    charset: utf-8                  # 模板字符集
+    debug: ~                        # 启用 Twig 调试模式
+    cache: false                    # 指定可写目录以启用 Twig 缓存
+    auto_reload: ~                  # 模板变更时自动重新编译
+
+##
+# 内容
+#
+date_format: "%Y-%m-%d %H:%M"       # Wwppcms 默认中文日期格式；参考 https://php.net/manual/en/function.strftime.php
+pages_order_by_meta: author         # 按元数据 author 排序（pages_order_by 设为 meta）
+pages_order_by: alpha               # 页面排序方式：alpha/date/meta
+pages_order: asc                    # 排序方向：asc/desc
+content_dir: ~                      # 内容目录路径
+content_ext: .md                    # Markdown 文件扩展名
+content_config:                     # Parsedown Markdown 解析配置
+    extra: true                     # 使用 Parsedown Extra 支持扩展语法；见 https://michelf.ca/projects/php-markdown/extra/
+    breaks: false                   # 是否保留换行
+    escape: false                   # 是否转义内容中的 HTML（非安全模式，不用于不可信输入）
+    auto_urls: true                 # 自动为内容中的 URL 添加链接
+assets_dir: assets/                 # 静态资源目录路径
+assets_url: ~                       # 自动猜测资源目录 URL，失败时在此填写；示例：https://example.com/wwppcms/assets/
+
+##
+# 插件
+#
+plugins_url: ~                      # 自动猜测插件目录 URL，失败时在此填写；示例：https://example.com/wwppcms/plugins/
+DummyPlugin.enabled: false          # 强制禁用 DummyPlugin
+WwppcmsDeprecated.enabled: true     # 提供旧版本 API/主题的兼容层
+# PpwwcmsRobots 示例（取消注释并按需修改即可自定义 robots.txt 与 sitemap）
+# PpwwcmsRobots:
+#   robots:
+#     - user_agents: "*"
+#       disallow: []                # 留空表示允许全部
+#       allow: ["/"]
+#     - user_agents: "AhrefsBot"
+#       disallow: ["/"]            # 禁止某些爬虫
+#   sitemap:
+#     - url: %base_url%/custom-page # 额外加入自定义 URL
+#       changefreq: weekly
+#       priority: 0.7
+##
+# 自定义
+#
+my_custom_setting: Hello World!     # 在主题中可用 {{ config.my_custom_setting }} 访问此设置
