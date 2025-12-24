@@ -46,6 +46,36 @@ assets_url: ~                       # 自动猜测资源目录 URL，失败时�
 plugins_url: ~                      # 自动猜测插件目录 URL，失败时在此填写；示例：https://example.com/wwppcms/plugins/
 DummyPlugin.enabled: false          # 强制禁用 DummyPlugin
 WwppcmsDeprecated.enabled: true     # 提供旧版本 API/主题的兼容层
+# PpwwcmsSchemaLd 示例（取消注释启用；字段优先级：页面 front-matter > 此处配置 > 自动兜底）
+# PpwwcmsSchemaLd:
+#   website:
+#     name: 示例站点名
+#     url: https://example.com/
+#     search_url: https://example.com/search?q={search_term_string}
+#   organization:
+#     name: 示例公司
+#     url: https://example.com/
+#     logo: https://example.com/assets/logo.png
+#     sameAs: [https://twitter.com/example, https://www.linkedin.com/company/example]
+#   breadcrumb:
+#     - name: 首页
+#       url: https://example.com/
+#   article:
+#     author: 示例作者
+#     section: 教程
+#     tags: [标签A, 标签B]
+#   itemList:
+#     items:
+#       - name: 推荐一
+#         url: https://example.com/a
+#       - name: 推荐二
+#         url: https://example.com/b
+#   faq:
+#     items:
+#       - question: 问题1？
+#         answer: 回答1。
+#       - question: 问题2？
+#         answer: 回答2。
 # PpwwcmsOg 示例（取消注释以启用并自定义默认 OG/Twitter/Article/Robots）
 # PpwwcmsOg:
 #   og:
