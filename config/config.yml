@@ -195,7 +195,8 @@ PpwwcmsAds:
     sidebar: sidebar_box
 
     # 正文最上方插入一个广告（会拼到正文 HTML 最前面）
-    content_top: content_top
+    # about 页面正文里没有 <p> 段落时，after_paragraph 不会生效；用 content_top 更稳。
+    content_top: about_top_img
     # 正文最下方插入一个广告（会拼到正文 HTML 最末尾）
     content_bottom: content_bottom
 
@@ -433,6 +434,20 @@ PpwwcmsAds:
           - "/"
       creatives:
         - id: img1
+          type: image
+          weight: 100
+          src: "/assets/ads/ads-yiye.gif"
+          href: "https://baidu.com/"
+          alt: "一页博彩导航"
+
+    # about 页：顶部图片广告（不依赖段落数）
+    about_top_img:
+      targeting:
+        include:
+          - "/about"
+          - "/about/"
+      creatives:
+        - id: about_img1
           type: image
           weight: 100
           src: "/assets/ads/ads-yiye.gif"
