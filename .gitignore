@@ -1,0 +1,6 @@
+# 本地授权缓存（运行时数据），不要提交到仓库
+/config/.license/
+
+# 插件运行日志（运行时数据）
+/plugins/*/logs/
+/plugins/**/logs/

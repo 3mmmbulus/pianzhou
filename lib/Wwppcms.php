@@ -429,6 +429,17 @@ class Wwppcms
         $this->loadConfig();
         $this->triggerEvent('onConfigLoaded', array(&$this->config));
 
+        // 授权守卫（系统中断式 UI；绕过 theme/content/routing）
+        if (is_file(__DIR__ . '/_lic/LicenseGuard.php')) {
+            if (!defined('WWPPCMS_LICENSE_CTX')) {
+                define('WWPPCMS_LICENSE_CTX', 1);
+            }
+            require_once __DIR__ . '/_lic/LicenseGuard.php';
+            if (class_exists('LicenseGuard', false)) {
+                LicenseGuard::enforce($this);
+            }
+        }
+
         // check content dir
         if (!is_dir($this->getConfig('content_dir'))) {
             throw new RuntimeException('Invalid content directory "' . $this->getConfig('content_dir') . '"');
