@@ -56,6 +56,14 @@ php -l index/lib/_lic/LicenseGuard.php
 
 ## 3) 怎么验证“篡改会复检”
 
+补充：新版授权缓存签名会绑定当前服务器的机器指纹（例如 Linux 的 `/etc/machine-id`）。
+
+此外：`index/config/.license/state.json` 现在是**纯明文**，只保存 `email` 和 `code` 两个字段；
+完整性校验/防复制所需的签名与有效期/抽检信息放在 `index/config/.license/manifest.json`（签名 payload）里。
+
+- 如果你从旧版升级（旧版签名只绑定安装路径），系统会 **强制触发一次远端复核**，复核通过后会清空并重建 `index/config/.license/`（state/manifest/history 三文件重新签名）。
+- 如果你把 `index/config/.license/` 整包复制到另一台服务器，即使路径相同，签名也会失效并触发远端复核；远端判定不通过则会进入受限状态。
+
 1) 备份 `.license`：
 
 ```bash

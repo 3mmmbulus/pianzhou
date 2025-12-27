@@ -429,16 +429,19 @@ class Wwppcms
         $this->loadConfig();
         $this->triggerEvent('onConfigLoaded', array(&$this->config));
 
-        // 授权守卫（系统中断式 UI；绕过 theme/content/routing）
-        if (is_file(__DIR__ . '/_lic/LicenseGuard.php')) {
-            if (!defined('WWPPCMS_LICENSE_CTX')) {
-                define('WWPPCMS_LICENSE_CTX', 1);
-            }
-            require_once __DIR__ . '/_lic/LicenseGuard.php';
-            if (class_exists('LicenseGuard', false)) {
-                LicenseGuard::enforce($this);
-            }
+        // 授权守卫：强依赖（缺失/损坏直接抛错，避免通过“删除文件”绕过授权）
+        $licenseGuardPath = __DIR__ . '/_lic/LicenseGuard.php';
+        if (!is_file($licenseGuardPath)) {
+            throw new RuntimeException('License guard missing: ' . $licenseGuardPath);
         }
+        if (!defined('WWPPCMS_LICENSE_CTX')) {
+            define('WWPPCMS_LICENSE_CTX', 1);
+        }
+        require_once $licenseGuardPath;
+        if (!class_exists('LicenseGuard', false)) {
+            throw new RuntimeException('License guard invalid (class not found): ' . $licenseGuardPath);
+        }
+        LicenseGuard::enforce($this);
 
         // check content dir
         if (!is_dir($this->getConfig('content_dir'))) {

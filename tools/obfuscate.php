@@ -85,6 +85,10 @@ $tokens = token_get_all($src);
 
 $reservedVars = array(
     '$this' => true,
+    // PHP magic vars
+    '$http_response_header' => true,
+    '$argc' => true,
+    '$argv' => true,
     '$GLOBALS' => true,
     '$_GET' => true,
     '$_POST' => true,

@@ -21,6 +21,8 @@ final class LicenseGuard
     private const ACTION_AUTHORIZE = 'authorize';
     private const ACTION_RESET = 'reset';
 
+    private const STATE_VERSION = 2;
+
     /**
      * 入口：在 Wwppcms::run() 早期调用。
      * - 非授权入口：校验通过则继续；失败则 302 跳转 /?__license=1
@@ -141,10 +143,11 @@ final class LicenseGuard
                 return;
             }
 
-            // 写入 state + manifest
-            $state = self::buildStateFromRemote($rootDir, $email, $code, $serverIp, $payload);
-            self::saveState($rootDir, $storageDir, $state);
-            self::writeManifest($rootDir, $storageDir);
+            // 写入 state（仅 email/code） + manifest（签名：含有效期/抽检/绑定信息）
+            $state = self::buildStateFromRemote($email, $code);
+            $licenseMeta = self::buildLicenseMetaFromRemote($rootDir, $serverIp, $payload);
+            self::saveStatePlain($storageDir, $state);
+            self::writeManifest($rootDir, $storageDir, $licenseMeta);
 
             // 成功后跳回原访问地址
             if (!headers_sent()) {
@@ -186,27 +189,71 @@ final class LicenseGuard
         if (defined('WWPP_SELF_TAMPER') && WWPP_SELF_TAMPER === 1) {
             $abnormal = 'self_tamper';
         }
-        $state = self::loadState($rootDir, $storageDir);
+
+        $state = self::loadStatePlain($rootDir, $storageDir);
+        $manifest = self::loadManifest($rootDir, $storageDir);
 
         $now = time();
         $needsRemote = false;
         $reason = null;
+
+        // 若 state 仍为旧格式（带 sig/payload），优先尝试无远端迁移为纯 state（仅 email/code）
+        // 同时把 expires/audit/license_id 等写入签名的 manifest.license。
+        if ($abnormal === null && is_array($state) && ($state['__state_fmt'] ?? '') === 'signed' && is_array($manifest) && ($manifest['__sig_key'] ?? '') !== 'legacy') {
+            $licenseMeta = null;
+            if (isset($manifest['license']) && self::isLicenseMetaSane($manifest['license'])) {
+                $licenseMeta = $manifest['license'];
+            } else {
+                $licenseMeta = self::buildLicenseMetaFromStatePayload($rootDir, $state);
+            }
+
+            if (is_array($licenseMeta)) {
+                self::saveStatePlain($storageDir, $state);
+                self::writeManifest($rootDir, $storageDir, $licenseMeta);
+                $state = self::loadStatePlain($rootDir, $storageDir);
+                $manifest = self::loadManifest($rootDir, $storageDir);
+            }
+        }
 
         if ($abnormal !== null) {
             $needsRemote = true;
             $reason = 'abnormal:' . $abnormal;
         } elseif ($state === null) {
             return array('ok' => false, 'reason' => 'no_state');
-        } elseif (!self::isStateSane($state)) {
+        } elseif (!self::isStatePlainSane($state)) {
             $needsRemote = true;
             $reason = 'state_invalid';
+        } elseif ($manifest === null) {
+            // state 存在但 manifest 不存在/不可验：无法本地判断到期/抽检，触发远端并重建 manifest
+            $needsRemote = true;
+            $reason = 'manifest_missing';
+        } elseif (($manifest['__sig_key'] ?? '') === 'legacy') {
+            // 旧版仅绑定安装路径的签名：强制远端复核并重建为“机器绑定”版本，防止整包复制。
+            $needsRemote = true;
+            $reason = 'legacy_unbound';
         } else {
-            $expiresAt = self::parseIsoTime($state['expires_at'] ?? null);
+            $license = $manifest['license'] ?? null;
+            if (!self::isLicenseMetaSane($license)) {
+                // 尝试从旧 state payload 迁移出 license meta（不打远端）
+                $m = self::buildLicenseMetaFromStatePayload($rootDir, is_array($state) ? $state : array());
+                if (is_array($m)) {
+                    self::writeManifest($rootDir, $storageDir, $m);
+                    $manifest = self::loadManifest($rootDir, $storageDir);
+                    $license = $manifest['license'] ?? null;
+                }
+            }
+
+            if (!self::isLicenseMetaSane($license)) {
+                $needsRemote = true;
+                $reason = 'license_meta_invalid';
+            }
+
+            $expiresAt = self::parseIsoTime(is_array($license) ? ($license['expires_at'] ?? null) : null);
             if ($expiresAt === null || $expiresAt <= $now) {
                 $needsRemote = true;
                 $reason = 'expired_or_missing_expires_at';
             } else {
-                $nextAuditAt = (int) ($state['next_audit_at'] ?? 0);
+                $nextAuditAt = (int) (is_array($license) ? ($license['next_audit_at'] ?? 0) : 0);
                 if ($nextAuditAt > 0 && $nextAuditAt <= $now) {
                     $needsRemote = true;
                     $reason = 'scheduled_audit_due';
@@ -215,11 +262,36 @@ final class LicenseGuard
         }
 
         if (!$needsRemote) {
-            return array('ok' => true, 'reason' => 'local_ok', 'state' => $state);
+            $license = is_array($manifest) ? ($manifest['license'] ?? array()) : array();
+            $view = array(
+                'email' => (string) ($state['email'] ?? ''),
+                'code' => (string) ($state['code'] ?? ''),
+            );
+            if (is_array($license)) {
+                foreach (array('license_key_id', 'expires_at', 'next_audit_at') as $k) {
+                    if (isset($license[$k])) {
+                        $view[$k] = $license[$k];
+                    }
+                }
+            }
+            return array('ok' => true, 'reason' => 'local_ok', 'state' => $view);
         }
 
         if ($skipRemoteIfPossible) {
-            return array('ok' => ($state !== null && self::isStateSane($state)), 'reason' => $reason, 'state' => $state);
+            $license = is_array($manifest) ? ($manifest['license'] ?? null) : null;
+            $ok = ($state !== null && self::isStatePlainSane($state) && self::isLicenseMetaSane($license));
+            $view = array(
+                'email' => (string) ($state['email'] ?? ''),
+                'code' => (string) ($state['code'] ?? ''),
+            );
+            if (is_array($license)) {
+                foreach (array('license_key_id', 'expires_at', 'next_audit_at') as $k) {
+                    if (isset($license[$k])) {
+                        $view[$k] = $license[$k];
+                    }
+                }
+            }
+            return array('ok' => $ok, 'reason' => $reason, 'state' => $view);
         }
 
         // 需要远端：尽量从本地缓存/历史中恢复 email+code（即便 state/manifest 被手动改坏）
@@ -267,16 +339,18 @@ final class LicenseGuard
             return array('ok' => false, 'reason' => 'remote_denied:' . (string) ($payload['code'] ?? 'UNKNOWN'));
         }
 
-        $newState = self::buildStateFromRemote($rootDir, $email, $code, $serverIp, $payload);
+        $newState = self::buildStateFromRemote($email, $code);
+        $licenseMeta = self::buildLicenseMetaFromRemote($rootDir, $serverIp, $payload);
 
-        // 若本地缓存疑似被篡改：复检通过则重置 .license 缓存（优化用户体验）
-        if ($cacheTampered) {
+        // 若本地缓存疑似被篡改 / 或需要从 legacy 升级到机器绑定版本：复检通过则重置 .license 缓存
+        $needsRebuildCache = $cacheTampered || (is_string($reason) && strpos($reason, 'legacy_unbound') !== false);
+        if ($needsRebuildCache) {
             self::clearDirContents($storageDir);
             self::ensureStorageDir($storageDir);
         }
 
-        self::saveState($rootDir, $storageDir, $newState);
-        if ($cacheTampered) {
+        self::saveStatePlain($storageDir, $newState);
+        if ($needsRebuildCache) {
             self::appendHistory($rootDir, $storageDir, array(
                 'event' => 'cache_rebuilt_after_revalidate',
                 'ok' => true,
@@ -284,9 +358,18 @@ final class LicenseGuard
                 'creds_source' => $credsSource,
             ));
         }
-        self::writeManifest($rootDir, $storageDir);
+        self::writeManifest($rootDir, $storageDir, $licenseMeta);
 
-        return array('ok' => true, 'reason' => 'remote_ok', 'state' => $newState);
+        $view = array(
+            'email' => (string) ($newState['email'] ?? ''),
+            'code' => (string) ($newState['code'] ?? ''),
+        );
+        foreach (array('license_key_id', 'expires_at', 'next_audit_at') as $k) {
+            if (isset($licenseMeta[$k])) {
+                $view[$k] = $licenseMeta[$k];
+            }
+        }
+        return array('ok' => true, 'reason' => 'remote_ok', 'state' => $view);
     }
 
     private static function isCacheTamperAbnormal(string $abnormal): bool
@@ -307,12 +390,24 @@ final class LicenseGuard
 
     private static function getCredsForRemote(string $rootDir, string $storageDir, ?array $signedState): ?array
     {
-        // 1) 优先用已验证签名的 state
+        // 1) 优先用本地 state（当前版本为纯 email/code；旧版本可能仍带 enc 字段）
         if (is_array($signedState)) {
-            $email = self::decryptField($rootDir, $signedState['email_enc'] ?? null);
-            $code = self::decryptField($rootDir, $signedState['code_enc'] ?? null);
+            $email = null;
+            $code = null;
+
+            if (isset($signedState['email']) && is_string($signedState['email']) && $signedState['email'] !== '') {
+                $email = (string) $signedState['email'];
+            } else {
+                $email = self::decryptField($rootDir, $signedState['email_enc'] ?? null);
+            }
+
+            if (isset($signedState['code']) && is_string($signedState['code']) && $signedState['code'] !== '') {
+                $code = (string) $signedState['code'];
+            } else {
+                $code = self::decryptField($rootDir, $signedState['code_enc'] ?? null);
+            }
             if (is_string($email) && $email !== '' && is_string($code) && $code !== '') {
-                return array('email' => $email, 'code' => $code, 'source' => 'state_signed');
+                return array('email' => $email, 'code' => $code, 'source' => 'state');
             }
         }
 
@@ -395,7 +490,10 @@ final class LicenseGuard
             return null;
         }
         $payload = $doc['payload'] ?? null;
-        return is_array($payload) ? $payload : null;
+        if (is_array($payload)) {
+            return $payload;
+        }
+        return $doc;
     }
 
     private static function ensureStorageDir(string $storageDir): void
@@ -422,6 +520,11 @@ final class LicenseGuard
         $manifest = self::readSignedJsonFile($rootDir, $manifestPath);
         if ($manifest === null) {
             return 'manifest_invalid';
+        }
+
+        // manifest 若仍是 legacy（只绑定路径）签名：强制远端复核并重建为“机器绑定”版本
+        if (($manifest['__sig_key'] ?? '') === 'legacy') {
+            return 'legacy_unbound';
         }
 
         $expected = $manifest['files'] ?? null;
@@ -536,33 +639,78 @@ final class LicenseGuard
         return $queue;
     }
 
-    private static function loadState(string $rootDir, string $storageDir): ?array
+    private static function loadStatePlain(string $rootDir, string $storageDir): ?array
     {
         $path = $storageDir . '/' . self::STATE_FILE;
-        return self::readSignedJsonFile($rootDir, $path);
+        if (!is_file($path)) {
+            return null;
+        }
+        $raw = @file_get_contents($path);
+        if (!is_string($raw) || $raw === '') {
+            return null;
+        }
+        $doc = json_decode($raw, true);
+        if (!is_array($doc)) {
+            return null;
+        }
+
+        // 新格式：纯 state，仅包含 email/code
+        if (isset($doc['email'], $doc['code']) && is_string($doc['email']) && is_string($doc['code'])) {
+            return array(
+                'email' => (string) $doc['email'],
+                'code' => (string) $doc['code'],
+                '__state_fmt' => 'plain',
+            );
+        }
+
+        // 旧格式：带 sig/payload（用于迁移）
+        if (isset($doc['sig'], $doc['payload']) && is_string($doc['sig']) && is_array($doc['payload'])) {
+            $payload = self::readSignedJsonFile($rootDir, $path);
+            if (is_array($payload)) {
+                $payload['__state_fmt'] = 'signed';
+                return $payload;
+            }
+
+            // 签名无效：尽量提取 email/code 供远端复核
+            $unsafe = self::readUnsignedJsonFile($path);
+            if (is_array($unsafe)) {
+                $unsafe['__state_fmt'] = 'signed_unsafe';
+                return $unsafe;
+            }
+        }
+
+        // 兜底：允许用户手动写成 {"email":"...","code":"..."} 之外的结构时仍可提取
+        if (isset($doc['payload']) && is_array($doc['payload'])) {
+            $p = $doc['payload'];
+            if (isset($p['email'], $p['code']) && is_string($p['email']) && is_string($p['code'])) {
+                $p['__state_fmt'] = 'payload_only';
+                return $p;
+            }
+        }
+
+        return null;
     }
 
-    private static function isStateSane(array $state): bool
+    private static function isStatePlainSane(array $state): bool
     {
-        if (!isset($state['license_key_id']) || !is_string($state['license_key_id']) || $state['license_key_id'] === '') {
+        if (!isset($state['email']) || !is_string($state['email']) || $state['email'] === '') {
             return false;
         }
-        if (!isset($state['expires_at']) || !is_string($state['expires_at']) || $state['expires_at'] === '') {
-            return false;
-        }
-        if (!isset($state['email_enc']) || !is_string($state['email_enc']) || $state['email_enc'] === '') {
-            return false;
-        }
-        if (!isset($state['code_enc']) || !is_string($state['code_enc']) || $state['code_enc'] === '') {
+        if (!isset($state['code']) || !is_string($state['code']) || $state['code'] === '') {
             return false;
         }
         return true;
     }
 
-    private static function saveState(string $rootDir, string $storageDir, array $state): void
+    private static function saveStatePlain(string $storageDir, array $state): void
     {
+        self::ensureStorageDir($storageDir);
         $path = $storageDir . '/' . self::STATE_FILE;
-        self::writeSignedJsonFile($rootDir, $path, $state);
+        $payload = array(
+            'email' => (string) ($state['email'] ?? ''),
+            'code' => (string) ($state['code'] ?? ''),
+        );
+        self::writePlainJsonFile($path, $payload);
     }
 
     private static function appendHistory(string $rootDir, string $storageDir, array $payload): void
@@ -613,7 +761,30 @@ final class LicenseGuard
         return null;
     }
 
-    private static function writeManifest(string $rootDir, string $storageDir): void
+    private static function loadManifest(string $rootDir, string $storageDir): ?array
+    {
+        $manifestPath = $storageDir . '/' . self::MANIFEST_FILE;
+        return self::readSignedJsonFile($rootDir, $manifestPath);
+    }
+
+    private static function isLicenseMetaSane($license): bool
+    {
+        if (!is_array($license)) {
+            return false;
+        }
+        if (!isset($license['license_key_id']) || !is_string($license['license_key_id']) || $license['license_key_id'] === '') {
+            return false;
+        }
+        if (!isset($license['expires_at']) || !is_string($license['expires_at']) || $license['expires_at'] === '') {
+            return false;
+        }
+        if (!isset($license['next_audit_at'])) {
+            return false;
+        }
+        return true;
+    }
+
+    private static function writeManifest(string $rootDir, string $storageDir, array $licenseMeta): void
     {
         self::ensureStorageDir($storageDir);
 
@@ -641,8 +812,9 @@ final class LicenseGuard
         }
 
         $manifest = array(
-            'version' => 1,
+            'version' => 2,
             'ts' => gmdate('c'),
+            'license' => $licenseMeta,
             'files' => $files,
         );
 
@@ -670,12 +842,21 @@ final class LicenseGuard
         }
 
         $payloadJson = self::jsonCanonical($payload);
+
+        // 1) 当前版本（机器绑定）签名
         $calc = self::hmac($rootDir, $payloadJson);
-        if (!hash_equals($calc, $sig)) {
-            return null;
+        if (hash_equals($calc, $sig)) {
+            return $payload;
         }
 
-        return $payload;
+        // 2) 兼容 legacy（仅绑定安装路径）签名：只用于触发迁移，不作为长期放行依据
+        $calcLegacy = self::hmacLegacy($rootDir, $payloadJson);
+        if (hash_equals($calcLegacy, $sig)) {
+            $payload['__sig_key'] = 'legacy';
+            return $payload;
+        }
+
+        return null;
     }
 
     private static function writeSignedJsonFile(string $rootDir, string $path, array $payload): void
@@ -691,6 +872,13 @@ final class LicenseGuard
         @rename($tmp, $path);
     }
 
+    private static function writePlainJsonFile(string $path, array $payload): void
+    {
+        $tmp = $path . '.tmp.' . bin2hex(random_bytes(6));
+        @file_put_contents($tmp, self::jsonCanonical($payload), LOCK_EX);
+        @rename($tmp, $path);
+    }
+
     private static function jsonCanonical($data): string
     {
         return (string) json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -702,6 +890,12 @@ final class LicenseGuard
         return hash_hmac('sha256', $data, $key);
     }
 
+    private static function hmacLegacy(string $rootDir, string $data): string
+    {
+        $key = self::deriveKeyLegacy($rootDir);
+        return hash_hmac('sha256', $data, $key);
+    }
+
     private static function hx(string $hex): string
     {
         $bin = hex2bin($hex);
@@ -710,8 +904,44 @@ final class LicenseGuard
 
     private static function deriveKey(string $rootDir): string
     {
-        // 加密后此密钥不可见；同时绑定安装路径，降低跨站复制
+        // 密钥不可见；同时绑定安装路径 + 当前机器指纹，降低“整包复制到其他服务器”风险
+        return hash('sha256', self::hx(self::SECRET_HEX) . '|' . $rootDir . '|' . self::getHostBind(), true);
+    }
+
+    private static function deriveKeyLegacy(string $rootDir): string
+    {
+        // 旧版：仅绑定安装路径（用于迁移兼容）
         return hash('sha256', self::hx(self::SECRET_HEX) . '|' . $rootDir, true);
+    }
+
+    private static function getHostBind(): string
+    {
+        $mid = self::readMachineId();
+        $seed = array(
+            $mid !== null ? ('mid:' . $mid) : 'mid:NULL',
+            'hn:' . (string) php_uname('n'),
+            'os:' . (string) php_uname('s') . '|' . (string) php_uname('r'),
+        );
+        return hash('sha256', implode('|', $seed));
+    }
+
+    private static function readMachineId(): ?string
+    {
+        $candidates = array('/etc/machine-id', '/var/lib/dbus/machine-id');
+        foreach ($candidates as $p) {
+            if (!is_file($p)) {
+                continue;
+            }
+            $raw = @file_get_contents($p);
+            if (!is_string($raw)) {
+                continue;
+            }
+            $id = trim($raw);
+            if ($id !== '') {
+                return $id;
+            }
+        }
+        return null;
     }
 
     private static function encryptField(string $rootDir, string $plain): string
@@ -742,6 +972,7 @@ final class LicenseGuard
         }
 
         $key = self::deriveKey($rootDir);
+        $legacyKey = self::deriveKeyLegacy($rootDir);
 
         if (strpos($enc, 'aes:') === 0) {
             $raw = base64_decode(substr($enc, 4), true);
@@ -752,7 +983,12 @@ final class LicenseGuard
             $cipher = substr($raw, 16);
             if (function_exists('openssl_decrypt')) {
                 $plain = openssl_decrypt($cipher, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
-                return ($plain === false) ? null : $plain;
+                if ($plain !== false) {
+                    return $plain;
+                }
+                // 兼容 legacy 加密
+                $plainLegacy = openssl_decrypt($cipher, 'AES-256-CBC', $legacyKey, OPENSSL_RAW_DATA, $iv);
+                return ($plainLegacy === false) ? null : $plainLegacy;
             }
             return null;
         }
@@ -762,35 +998,74 @@ final class LicenseGuard
             if ($raw === false) {
                 return null;
             }
+            // 先尝试当前 key
             $mask = hash('sha256', $key, true);
             $out = '';
             for ($i = 0; $i < strlen($raw); $i++) {
                 $out .= $raw[$i] ^ $mask[$i % strlen($mask)];
             }
-            return $out;
+            if ($out !== '') {
+                return $out;
+            }
+            // 再尝试 legacy key
+            $mask2 = hash('sha256', $legacyKey, true);
+            $out2 = '';
+            for ($i = 0; $i < strlen($raw); $i++) {
+                $out2 .= $raw[$i] ^ $mask2[$i % strlen($mask2)];
+            }
+            return $out2;
         }
 
         return null;
     }
 
-    private static function buildStateFromRemote(string $rootDir, string $email, string $code, string $serverIp, array $payload): array
+    private static function buildStateFromRemote(string $email, string $code): array
+    {
+        return array(
+            'email' => $email,
+            'code' => $code,
+        );
+    }
+
+    private static function buildLicenseMetaFromRemote(string $rootDir, string $serverIp, array $payload): array
     {
         $now = time();
         return array(
-            'version' => 1,
+            'version' => self::STATE_VERSION,
             'license_key_id' => (string) ($payload['license_key_id'] ?? ''),
-            'status' => (string) ($payload['status'] ?? ''),
-            'activated' => (bool) ($payload['activated'] ?? false),
-            'first_used_at' => (string) ($payload['first_used_at'] ?? ''),
             'expires_at' => (string) ($payload['expires_at'] ?? ''),
-            'last_ok_at' => gmdate('c'),
             'next_audit_at' => self::scheduleNextAudit($now),
-            // 为了用户可视化：明文展示（仍受签名保护，任何修改都会触发异常复核）
-            'email' => $email,
-            'code' => $code,
-            'email_enc' => self::encryptField($rootDir, $email),
-            'code_enc' => self::encryptField($rootDir, $code),
             'server_ip_enc' => self::encryptField($rootDir, $serverIp),
+        );
+    }
+
+    private static function buildLicenseMetaFromStatePayload(string $rootDir, array $statePayload): ?array
+    {
+        // 支持从旧 state（签名 payload）迁移：把 expires/audit/license_id/server_ip_enc 放进 manifest.license
+        if (!isset($statePayload['license_key_id']) || !is_string($statePayload['license_key_id']) || $statePayload['license_key_id'] === '') {
+            return null;
+        }
+        if (!isset($statePayload['expires_at']) || !is_string($statePayload['expires_at']) || $statePayload['expires_at'] === '') {
+            return null;
+        }
+
+        $nextAuditAt = (int) ($statePayload['next_audit_at'] ?? 0);
+        if ($nextAuditAt <= 0) {
+            $nextAuditAt = self::scheduleNextAudit(time());
+        }
+
+        $serverIpEnc = isset($statePayload['server_ip_enc']) && is_string($statePayload['server_ip_enc']) ? (string) $statePayload['server_ip_enc'] : '';
+        // 若旧版没存加密 IP，留空也不影响本地放行；远端复核会重建
+        if ($serverIpEnc === '' && isset($statePayload['server_ip']) && is_string($statePayload['server_ip']) && $statePayload['server_ip'] !== '') {
+            $serverIpEnc = self::encryptField($rootDir, (string) $statePayload['server_ip']);
+        }
+
+        return array(
+            'version' => isset($statePayload['version']) ? (int) $statePayload['version'] : self::STATE_VERSION,
+            'license_key_id' => (string) $statePayload['license_key_id'],
+            'expires_at' => (string) $statePayload['expires_at'],
+            'next_audit_at' => $nextAuditAt,
+            'server_ip_enc' => $serverIpEnc,
         );
     }
 
@@ -894,27 +1169,125 @@ final class LicenseGuard
 
     private static function getPrimaryIp(): ?string
     {
-        // 纯 PHP：UDP connect 获取本机主出口 IP（不依赖外网可达性）
+        // 允许部署层显式指定“服务器主 IP”（用于容器内无法可靠获得宿主机公网 IP 的场景）
+        // 例如在 1panel / Docker 为 PHP 容器设置环境变量：WWPP_SERVER_IP=1.2.3.4
+        $override = getenv('WWPP_SERVER_IP');
+        if (is_string($override)) {
+            $override = trim($override);
+            if ($override !== '' && filter_var($override, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                return $override;
+            }
+        }
+
+        // 优先：不依赖 ext-sockets 的纯 PHP 方案（UDP connect 获取默认出口 IPv4）
+        // 说明：不会发送实际数据包，主要用于让内核选择默认路由并暴露本机 src IP。
+        if (function_exists('stream_socket_client') && function_exists('stream_socket_get_name')) {
+            $errno = 0;
+            $errstr = '';
+            $fp = @stream_socket_client('udp://1.1.1.1:53', $errno, $errstr, 1);
+            if (is_resource($fp)) {
+                $name = @stream_socket_get_name($fp, false);
+                @fclose($fp);
+                if (is_string($name) && $name !== '') {
+                    $pos = strrpos($name, ':');
+                    $ip = ($pos === false) ? $name : substr($name, 0, $pos);
+                    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                        // 容器内通常会得到 172.16/12 等私网 IP；如需公网 IP，可开启 WWPP_PUBLIC_IP_FALLBACK。
+                        if (self::isPublicIpv4($ip)) {
+                            return $ip;
+                        }
+                        $fallback = getenv('WWPP_PUBLIC_IP_FALLBACK');
+                        if (is_string($fallback) && trim($fallback) === '1') {
+                            $pub = self::detectPublicIpv4();
+                            if ($pub !== null) {
+                                return $pub;
+                            }
+                        }
+                        return $ip;
+                    }
+                }
+            }
+        }
+
+        // 其次：ext-sockets
         if (function_exists('socket_create')) {
             $sock = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
             if ($sock !== false) {
                 @socket_connect($sock, '1.1.1.1', 53);
                 $addr = null;
                 $port = null;
-                if (@socket_getsockname($sock, $addr, $port) && is_string($addr) && $addr !== '') {
+                if (@socket_getsockname($sock, $addr, $port) && is_string($addr) && $addr !== '' && filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                     @socket_close($sock);
-                    if (filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                    if (self::isPublicIpv4($addr)) {
                         return $addr;
                     }
+                    $fallback = getenv('WWPP_PUBLIC_IP_FALLBACK');
+                    if (is_string($fallback) && trim($fallback) === '1') {
+                        $pub = self::detectPublicIpv4();
+                        if ($pub !== null) {
+                            return $pub;
+                        }
+                    }
+                    return $addr;
                 }
                 @socket_close($sock);
             }
         }
 
-        // 兜底：SERVER_ADDR
+        // 兜底：SERVER_ADDR（注意：多IP/vhost 时可能不是“服务器主IP”）
         $addr = isset($_SERVER['SERVER_ADDR']) ? (string) $_SERVER['SERVER_ADDR'] : '';
         if (filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            if (self::isPublicIpv4($addr)) {
+                return $addr;
+            }
+            $fallback = getenv('WWPP_PUBLIC_IP_FALLBACK');
+            if (is_string($fallback) && trim($fallback) === '1') {
+                $pub = self::detectPublicIpv4();
+                if ($pub !== null) {
+                    return $pub;
+                }
+            }
             return $addr;
+        }
+
+        return null;
+    }
+
+    private static function isPublicIpv4(string $ip): bool
+    {
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
+    }
+
+    private static function detectPublicIpv4(): ?string
+    {
+        // 通过外网回显获取公网出口 IP（仅在显式开启 WWPP_PUBLIC_IP_FALLBACK=1 时使用）
+        $candidates = array(
+            'https://api.ipify.org',
+            'https://ifconfig.me/ip',
+        );
+
+        foreach ($candidates as $url) {
+            $ctx = stream_context_create(array(
+                'http' => array(
+                    'method' => 'GET',
+                    'timeout' => 2,
+                    'ignore_errors' => true,
+                    'header' => "User-Agent: wwppcms\r\n",
+                ),
+                'ssl' => array(
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
+                ),
+            ));
+
+            $resp = @file_get_contents($url, false, $ctx);
+            if (!is_string($resp) || $resp === '') {
+                continue;
+            }
+            $ip = trim($resp);
+            if ($ip !== '' && self::isPublicIpv4($ip)) {
+                return $ip;
+            }
         }
 
         return null;
@@ -955,6 +1328,9 @@ final class LicenseGuard
 
         $title = $isAuthed ? '授权已生效 / Licensed' : '系统授权验证 / License Verification';
 
+        $serverIp = self::getPrimaryIp();
+        $serverIpText = is_string($serverIp) && $serverIp !== '' ? $serverIp : 'unknown';
+
         $errorHtml = '';
         if (is_string($error) && $error !== '') {
             $errorHtml = '<div class="lg-alert lg-alert--error">'
@@ -972,6 +1348,7 @@ final class LicenseGuard
             . '  <div>'
             . '    <div class="lg-title">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</div>'
             . '    <div class="lg-sub">此页面为系统中断态 UI，不依赖主题/内容/路由。</div>'
+            . '    <div class="lg-sub">当前服务器默认 IP：' . htmlspecialchars($serverIpText, ENT_QUOTES, 'UTF-8') . ' / Current server default IP: ' . htmlspecialchars($serverIpText, ENT_QUOTES, 'UTF-8') . '</div>'
             . '  </div>'
             . '</div>';
 
@@ -981,11 +1358,6 @@ final class LicenseGuard
             $email = isset($state['email']) ? (string) $state['email'] : '';
             $code = isset($state['code']) ? (string) $state['code'] : '';
             $lid = (string) ($state['license_key_id'] ?? '');
-            $status = (string) ($state['status'] ?? '');
-            if ($status === 'used') {
-                $status = '正常';
-            }
-            $first = (string) ($state['first_used_at'] ?? '');
             $expires = (string) ($state['expires_at'] ?? '');
             $nextAudit = (int) ($state['next_audit_at'] ?? 0);
             $nextAuditStr = $nextAudit > 0 ? gmdate('c', $nextAudit) : '';
@@ -996,9 +1368,7 @@ final class LicenseGuard
                 . '  <div class="lg-grid">'
                 . '    <div class="lg-k">邮箱</div><div class="lg-v">' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '</div>'
                 . '    <div class="lg-k">授权码</div><div class="lg-v">' . htmlspecialchars($code, ENT_QUOTES, 'UTF-8') . '</div>'
-                . '    <div class="lg-k">授权状态</div><div class="lg-v">' . htmlspecialchars($status, ENT_QUOTES, 'UTF-8') . '</div>'
                 . '    <div class="lg-k">License ID</div><div class="lg-v">' . htmlspecialchars($lid, ENT_QUOTES, 'UTF-8') . '</div>'
-                . '    <div class="lg-k">初次授权时间</div><div class="lg-v">' . htmlspecialchars($first, ENT_QUOTES, 'UTF-8') . '</div>'
                 . '    <div class="lg-k">到期时间</div><div class="lg-v">' . htmlspecialchars($expires, ENT_QUOTES, 'UTF-8') . '</div>'
                 . '    <div class="lg-k">下次抽检时间</div><div class="lg-v">' . htmlspecialchars($nextAuditStr, ENT_QUOTES, 'UTF-8') . '</div>'
                 . '  </div>'
@@ -1013,14 +1383,17 @@ final class LicenseGuard
         } else {
             $content .= ''
                 . '<div class="lg-card">'
-                . '  <div class="lg-card-title">填写授权信息</div>'
+                . '  <div class="lg-card-title">未检测到有效授权信息 / No valid license state found.</div>'
+                . '  <div class="lg-muted">填写授权信息</div>'
                 . '  <form method="post" action="/?' . self::QUERY_FLAG . '=' . self::QUERY_FLAG_VALUE . '&' . self::QUERY_RETURN . '=' . rawurlencode($returnTo) . '">'
                 . '    <input type="hidden" name="' . self::FORM_FIELD_ACTION . '" value="' . self::ACTION_AUTHORIZE . '" />'
                 . '    <label class="lg-label">邮箱（您注册使用的邮箱地址）</label>'
-                . '    <input class="lg-input" name="email" type="email" required placeholder="user@example.com" />'
+                . '    <input class="lg-input" name="email" type="email" required placeholder="user@example.com" autocomplete="email" />'
                 . '    <label class="lg-label">授权码</label>'
-                . '    <input class="lg-input" name="code" type="text" required placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" style="text-transform:uppercase" />'
-                . '    <button class="lg-btn lg-btn--primary" type="submit">提交授权 / Authorize</button>'
+                . '    <input class="lg-input" name="code" type="text" required placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" />'
+                . '    <div class="lg-actions">'
+                . '      <button class="lg-btn lg-btn--primary" type="submit">提交授权 / Authorize</button>'
+                . '    </div>'
                 . '  </form>'
                 . '  <div class="lg-tip">提示：当需要远端校验且远端不可达时，不会放行。</div>'
                 . '</div>';
@@ -1137,24 +1510,33 @@ final class LicenseGuard
             . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
             . '<title>' . $t . '</title>'
             . '<style>'
-            . '  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial;}'
+            . '  :root{color-scheme:light;}'
+            . '  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial;line-height:1.5;background:#f6f7f9;color:#111;}'
             . '  .lg-wrap{width:100%;max-width:860px;}'
-            . '  .lg-panel{border:1px solid #ddd;border-radius:8px;padding:18px;box-sizing:border-box;}'
+            . '  .lg-panel{background:#fff;border:1px solid #e6e8ee;border-radius:14px;padding:22px;box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,.06);}'
             . '  .lg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}'
-            . '  .lg-title{font-size:18px;font-weight:700;}'
-            . '  .lg-sub{font-size:12px;line-height:1.5;margin-top:6px;}'
-            . '  .lg-link{text-decoration:underline;font-size:14px;}'
-            . '  .lg-card{border:1px solid #ddd;border-radius:8px;padding:14px;margin-top:12px;}'
-            . '  .lg-card-title{font-weight:650;font-size:13px;margin-bottom:10px;}'
-            . '  .lg-label{display:block;font-size:12px;margin:10px 0 6px;}'
-            . '  .lg-input{width:100%;padding:10px 12px;border-radius:6px;border:1px solid #ccc;outline:none;box-sizing:border-box;}'
-            . '  .lg-btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:6px;border:1px solid #ccc;background:transparent;text-decoration:none;cursor:pointer;font-size:13px;}'
-            . '  .lg-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}'
-            . '  .lg-tip{margin-top:12px;font-size:12px;}'
-            . '  .lg-grid{display:grid;grid-template-columns:140px 1fr;gap:8px 10px;font-size:13px;}'
+            . '  .lg-title{font-size:20px;font-weight:750;letter-spacing:.2px;}'
+            . '  .lg-sub{font-size:13px;line-height:1.55;margin-top:6px;color:#4b5563;}'
+            . '  .lg-muted{font-size:13px;color:#4b5563;margin:2px 0 10px;}'
+            . '  .lg-link{text-decoration:underline;font-size:14px;color:inherit;}'
+            . '  .lg-card{border:1px solid #e6e8ee;border-radius:12px;padding:16px;margin-top:12px;background:#fff;}'
+            . '  .lg-card-title{font-weight:700;font-size:14px;margin-bottom:10px;}'
+            . '  .lg-label{display:block;font-size:13px;margin:12px 0 7px;font-weight:600;}'
+            . '  .lg-input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #d6d9e1;outline:none;box-sizing:border-box;font-size:14px;}'
+            . '  .lg-input:focus{border-color:#9aa3b2;box-shadow:0 0 0 3px rgba(154,163,178,.25);}'
+            . '  .lg-btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:10px;border:1px solid #d6d9e1;background:#fff;color:#111;text-decoration:none;cursor:pointer;font-size:13px;font-weight:650;}'
+            . '  .lg-btn--primary{background:#111;border-color:#111;color:#fff;}'
+            . '  .lg-btn--danger{background:#fff;border-color:#ef4444;color:#b91c1c;}'
+            . '  .lg-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}'
+            . '  .lg-tip{margin-top:12px;font-size:13px;color:#4b5563;}'
+            . '  .lg-grid{display:grid;grid-template-columns:160px 1fr;gap:8px 12px;font-size:13px;}'
+            . '  .lg-k{color:#4b5563;}'
             . '  .lg-v{word-break:break-all;}'
-            . '  .lg-alert{border-radius:8px;padding:12px;border:1px solid #ddd;margin-top:12px;font-size:13px;line-height:1.55;}'
-            . '  .lg-footer{margin-top:16px;padding-top:12px;border-top:1px solid #ddd;text-align:center;font-size:16px;}'
+            . '  .lg-alert{border-radius:12px;padding:12px 14px;border:1px solid #e6e8ee;margin-top:12px;font-size:13px;line-height:1.55;background:#fafbfc;}'
+            . '  .lg-alert--error{border-color:#fecaca;background:#fff5f5;color:#7f1d1d;}'
+            . '  .lg-alert--info{border-color:#dbeafe;background:#f5faff;color:#1e3a8a;}'
+            . '  .lg-footer{margin-top:18px;padding-top:12px;border-top:1px solid #e6e8ee;text-align:center;font-size:14px;color:#4b5563;}'
+            . '  @media (max-width:640px){.lg-panel{padding:16px;border-radius:12px}.lg-grid{grid-template-columns:1fr}.lg-k{font-weight:650}}'
             . '</style>'
             . '</head>'
             . '<body>'
